@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta id="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1,  user-scalable=no,minimal-ui" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no">
+    <title>爆炸测试</title>
+</head>
+
+<body>
+    <image src="try-jquery.jpg" style="margin:300px;width:150px;display:block;"></image>
+    <script src="jquery-3.1.0.min.js"></script>
+    <script src="index.js"></script>
+    <script>
+        setTimeout(function() {
+            $("img").explode({
+                maxWidth: 20,
+                minWidth: 1,
+            });
+        },200)
+    </script>
+</body>
+
+</html>
