@@ -56,7 +56,7 @@
             $wrapper.css('position', 'relative');
         }
         const targetDisplay = $target.css("display");
-        
+
 
         function random(min, max) {
             return parseInt(Math.random() * (max + 1 - min), 10) + min;
@@ -113,6 +113,18 @@
         }
         const rags = generateRags();
         let ragTop = 0;
+
+        function setContent($dom) {
+            switch (background.kind) {
+            case 'image':
+                $dom.css('background-image', `url("${background.src}")`);
+                break;
+            case 'color':
+                $dom.css('background-color', `${background.color}`);
+                break;
+            default:
+            }
+        }
         rags.forEach((rag) => {
             const $dom = $('<div></div>', {});
             const {
@@ -130,50 +142,42 @@
                 'background-size': `${w}px ${h}px`,
                 'background-position': `${-left}px ${-top}px`,
             });
-            switch (background.kind) {
-            case 'image':
-                $dom.css('background-image', `url("${background.src}")`);
-                break;
-            case 'color':
-                $dom.css('background-color', `${background.color}`);
-                break;
-            default:
-            }
+            setContent($dom);
             rag.$dom = $dom;
             $wrapper.append($dom);
         });
 
         let remainCnt = rags.length;
         const degMax = 720;
-        rags.forEach((v,i) => {
+        rags.forEach((v, i) => {
             v.$dom.css('transition', '0.3s all ease-out');
 
             const rand1 = (Math.random() + 2) * v.width;
-            
+
             v.finalAngle = (((Math.random() * degMax) - (degMax / 2)) / ((Math.random() + 2) * v.width)) * 10;
             //            rand=Math.max(rand,3)
 
             //coordinate based on center point
             let x = v.left + v.width / 2 - w / 2;
             let y = v.top + v.width / 2 - h / 2;
-            
-            if(x===0){
-                x=i%2?-1:1;
+
+            if (x === 0) {
+                x = i % 2 ? -1 : 1;
             }
-            if(y===0){
-                y=(i%4<2)?-1:1;
+            if (y === 0) {
+                y = (i % 4 < 2) ? -1 : 1;
             }
-            
+
             const distance = Math.sqrt(x * x + y * y);
             const startRatio = 0.3;
             const width = v.width;
 
             const ratio = ((1 - startRatio) * (1 - v.width / maxWidth) + startRatio) * Math.random();
             const distanceResult = (radius - distance) * ratio + distance;
-            
-            const distanceSquare=distance*distance;
-            v.translateX = (distanceResult - distance)*Math.sqrt((distanceSquare-y*y)/(distanceSquare))*(x>0?1:-1);
-            v.translateY = (distanceResult - distance)*Math.sqrt((distanceSquare-x*x)/(distanceSquare))*(y>0?1:-1);
+
+            const distanceSquare = distance * distance;
+            v.translateX = (distanceResult - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1);
+            v.translateY = (distanceResult - distance) * Math.sqrt((distanceSquare - x * x) / (distanceSquare)) * (y > 0 ? 1 : -1);
             if (release) {
                 setTimeout(() => {
                     v.$dom.fadeOut({
@@ -190,14 +194,26 @@
                 }, 3000 / ratio);
             }
         });
-        $target.css("display", "none");
+
+        rags[0].$dom.on("transitionstart", function () {
+            console.log(1)
+        });
+        $target.hide();
         $target.after($wrapper);
+        $wrapper.css({
+            'background-size': `${w}px ${h}px`,
+            'background-position': `${0}px ${0}px`,
+        });
+        setContent($wrapper);
         setTimeout(function () {
-            
+
             for (let i in rags) {
                 const rag = rags[i];
                 rag.$dom.css('transform', `translate(${rag.translateX}px,${rag.translateY}px) rotate(${rag.finalAngle}deg)`);
             }
+            setTimeout(function () {
+                $wrapper.css("background-image", "none");
+            });
         });
     };
 })(jQuery);
