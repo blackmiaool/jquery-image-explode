@@ -56,8 +56,7 @@
             $wrapper.css('position', 'relative');
         }
         const targetDisplay = $target.css("display");
-        $target.css("display", "none");
-        $target.after($wrapper);
+        
 
         function random(min, max) {
             return parseInt(Math.random() * (max + 1 - min), 10) + min;
@@ -191,7 +190,10 @@
                 }, 3000 / ratio);
             }
         });
+        $target.css("display", "none");
+        $target.after($wrapper);
         setTimeout(function () {
+            
             for (let i in rags) {
                 const rag = rags[i];
                 rag.$dom.css('transform', `translate(${rag.translateX}px,${rag.translateY}px) rotate(${rag.finalAngle}deg)`);
