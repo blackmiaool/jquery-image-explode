@@ -9,17 +9,19 @@
     <title>爆炸测试</title>
 </head>
 
-<body>
-    <image src="try-jquery.jpg" style="margin:300px;width:150px;display:block;"></image>
-    <script src="jquery-3.1.0.min.js"></script>
+<body style="margin:0;">
+    <img src="try-jquery.jpg" style="margin:300px;margin:bottom:10px;width:150px;display:block;"/>
+    <script src="jquery-3.1.0.js"></script>
     <script src="index.js"></script>
     <script>
-        setTimeout(function() {
+            
             $("img").explode({
-                maxWidth: 20,
+                maxWidth: 12,
                 minWidth: 1,
+                radius:231,
+                release:false,
             });
-        },200)
+       
     </script>
 </body>
 

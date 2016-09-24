@@ -1,121 +1,201 @@
-(function($) {
-    $.fn.explode = function({
-        minWidth = 1,
+(function ($) {
+
+    $.fn.explode = function ({
+        minWidth = 3,
         maxWidth,
-        omitLastLine = true
+        omitLastLine = true,
+        radius = 8,
+        release = true,
+        recycle = true,
+        fill = true,
     }) {
         const $target = this;
-        let w = $target.width();
-        let h = $target.height();
-        let minorDimension = Math.min(w, h);
-        let backgroundImage=$target.attr("src");
-        if (!maxWidth) {
-            maxWidth = minorDimension / 2;
-        }
-        let $wrapper = $(`<div></div>`, {
-            class: "explode-wrapper",
+        const args = arguments;
+        $target.each(function () { //explode separately
+            const $dom = $(this);
+            if ($dom.prop("tagName") === "IMG") {
+                if (!$dom.prop("complete")) {
+                    $dom.on("load", function () {
+                        $dom.explode.apply($dom, args);
+                    });
+                }
+            }
         });
-        let syncStyles = ["width", "height", "margin-top", "margin-right", "margin-bottom", "margin-left", "position", "top", "right", "bottom", "left"];
-        syncStyles.forEach(function(v) {
+
+
+
+        const w = $target.width();
+        const h = $target.height();
+        const minorDimension = Math.min(w, h);
+        let background;
+
+        if ($target.prop('tagName') === 'IMG') {
+            background = {
+                kind: 'image',
+                src: $target.attr('src'),
+            };
+        } else {
+            background = {
+                kind: 'color',
+                color: $target.css('background-color'),
+            };
+        }
+
+        if (!maxWidth) {
+            maxWidth = minorDimension / 4;
+        }
+        const $wrapper = $('<div></div>', {
+            "class": 'explode-wrapper',
+        });
+        const syncStyles = ['width', 'height', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'position', 'top', 'right', 'bottom', 'left'];
+        syncStyles.forEach((v) => {
             $wrapper.css(v, $target.css(v));
         });
-//        $wrapper.css("background-color", "black");
-        if ($wrapper.css("position") === "static") {
-            $wrapper.css("position", "relative");
+        //        $wrapper.css("background-color", "black");
+        if ($wrapper.css('position') === 'static') {
+            $wrapper.css('position', 'relative');
         }
-
-        this.replaceWith($wrapper);
+        const targetDisplay = $target.css("display");
+        $target.css("display", "none");
+        $target.after($wrapper);
 
         function random(min, max) {
-            max++;
-            return parseInt(Math.random() * (max - min)) + min;
+            return parseInt(Math.random() * (max + 1 - min), 10) + min;
         }
-        window.random = random;
 
-        function generateRags({
-            w,
-            h,
-            minWidth,
-            maxWidth,
-            omitLastLine
-        }) {
+        //generate position and dimension of rags
+        //rewrite it to fit for you demand
+        function generateRags() {
             let rowCnt;
             if (omitLastLine) {
                 rowCnt = Math.floor(h / maxWidth);
             } else {
                 rowCnt = Math.ceil(h / maxWidth);
             }
-            let value;
-
-            let ret = [];
-            for (var row = 0; row < rowCnt; row++) {
+            let width;
+            const rags = [];
+            const ret = [];
+            for (let row = 0; row < rowCnt; row++) {
                 let rowSum = 0;
                 let column = 0;
-                do {
-                    if (value) {
-                        rowSum += value;
-                        if (ret[row] === undefined) {
-                            ret[row] = [];
+                const topBase = row * maxWidth;
+
+                function generate(width) {
+                    const left = rowSum;
+                    rowSum += width;
+                    rags.push({
+                        left,
+                        top: topBase,
+                        width,
+                    });
+                    if (fill) {
+                        for (let i = 1; i < parseInt(maxWidth / width); i++) {
+                            rags.push({
+                                left,
+                                top: topBase + i * width,
+                                width,
+                            });
                         }
-                        ret[row][column] = value;
+                    }
+                }
+                do {
+                    if (width) {
+                        generate(width);
                         column++;
                     }
-                    value = random(minWidth, maxWidth);
-                } while (w > rowSum + value);
-                ret[row][column] = w-rowSum;
+                    width = random(minWidth, maxWidth);
+                } while (w > rowSum + width);
+                if (w - rowSum >= minWidth) {
+                    generate(w - rowSum);
+                }
+
+            }
+            return rags;
+        }
+        const rags = generateRags();
+        let ragTop = 0;
+        rags.forEach((rag) => {
+            const $dom = $('<div></div>', {});
+            const {
+                left,
+                top,
+                width
+            } = rag;
+
+            $dom.css({
+                width,
+                height: width,
+                position: 'absolute',
+                left,
+                top,
+                'background-size': `${w}px ${h}px`,
+                'background-position': `${-left}px ${-top}px`,
+            });
+            switch (background.kind) {
+            case 'image':
+                $dom.css('background-image', `url("${background.src}")`);
+                break;
+            case 'color':
+                $dom.css('background-color', `${background.color}`);
+                break;
+            default:
+            }
+            rag.$dom = $dom;
+            $wrapper.append($dom);
+        });
+
+        let remainCnt = rags.length;
+        const degMax = 720;
+        rags.forEach((v,i) => {
+            v.$dom.css('transition', '0.3s all ease-out');
+
+            const rand1 = (Math.random() + 2) * v.width;
+            
+            v.finalAngle = (((Math.random() * degMax) - (degMax / 2)) / ((Math.random() + 2) * v.width)) * 10;
+            //            rand=Math.max(rand,3)
+
+            //coordinate based on center point
+            let x = v.left + v.width / 2 - w / 2;
+            let y = v.top + v.width / 2 - h / 2;
+            
+            if(x===0){
+                x=i%2?-1:1;
+            }
+            if(y===0){
+                y=(i%4<2)?-1:1;
             }
             
-           
-            return ret;
-        }
-        let ragMap = generateRags({
-            w,
-            h,
-            minWidth,
-            maxWidth,
-            omitLastLine
-        });
-        let ragTop=0;  
-        let rags=[];
-        ragMap.forEach(function(v, row) {
-            let left=0;
-            v.forEach(function(u, column, a) {
-                
-                const $dom=$(`<div></div>`,{});
-                $dom.css({
-                        width:u,
-                        height:u,
-                        position:"absolute",
-                        left,
-                        top:ragTop,
-                        "background-image":`url("${backgroundImage}")`,
-                        "background-size":`${w}px ${h}px`,
-                        "background-position": `${-left}px ${-ragTop}px`
-                    });
-                rags.push({
-                    $dom,
-                    left,
-                    top:ragTop,
-                    width:u,
-                })
-                left+=u;
-                $wrapper.append($dom);
-            });
-            ragTop+=maxWidth;
-        });
-        let centerX=w/2;
-        let centerY=h/2;
-        rags.forEach(function(v,i){            
-            v.$dom.css("transition","0.3s all ease-out");
+            const distance = Math.sqrt(x * x + y * y);
+            const startRatio = 0.3;
+            const width = v.width;
+
+            const ratio = ((1 - startRatio) * (1 - v.width / maxWidth) + startRatio) * Math.random();
+            const distanceResult = (radius - distance) * ratio + distance;
             
-            let rand1=(Math.random()+2)*v.width;
-            let degMax=720;
-            let rand2=(Math.random()*degMax-degMax/2)/((Math.random()+2)*v.width)*10;
-//            rand=Math.max(rand,3)
-            let ratio=8/rand1;
-            setTimeout(function(){
-                v.$dom.css("transform",`translate(${(v.left-centerX)*ratio}px,${(v.top-centerY+maxWidth)*ratio}px) rotate(${rand2}deg)`);    
-            })            
-        })
-    }
+            const distanceSquare=distance*distance;
+            v.translateX = (distanceResult - distance)*Math.sqrt((distanceSquare-y*y)/(distanceSquare))*(x>0?1:-1);
+            v.translateY = (distanceResult - distance)*Math.sqrt((distanceSquare-x*x)/(distanceSquare))*(y>0?1:-1);
+            if (release) {
+                setTimeout(() => {
+                    v.$dom.fadeOut({
+                        done: function () {
+                            v.$dom.remove();
+                            remainCnt--;
+                            if (!remainCnt) {
+                                //                                $target.css("display",targetDisplay);
+                                $target.fadeIn();
+                                $wrapper.remove();
+                            }
+                        },
+                    });
+                }, 3000 / ratio);
+            }
+        });
+        setTimeout(function () {
+            for (let i in rags) {
+                const rag = rags[i];
+                rag.$dom.css('transform', `translate(${rag.translateX}px,${rag.translateY}px) rotate(${rag.finalAngle}deg)`);
+            }
+        });
+    };
 })(jQuery);
