@@ -17,18 +17,22 @@
     <script>
         function explode() {
             $(".explode-wrapper").remove();
-            $("img").show().explode({
-                maxWidth: 12,
-                minWidth: 3,
-                radius: 331,
-                release: false,
-                recycle:false,
-                explodeTime: 400,
-                canvas:true,
-                maxAngle:360,
-            });
+            $("img").show()
+            setTimeout(function () {
+                
+                $("img").explode({
+                    maxWidth: 12,
+                    minWidth: 3,
+                    radius: 331,
+                    release: false,
+                    recycle: false,
+                    explodeTime: 400,
+                    canvas: true,
+                    maxAngle: 360,
+                });
+            }, 300)
         }
-        $("img").on("click",function(){
+        $("img").on("click", function () {
             explode();
         });
         explode();
