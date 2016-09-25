@@ -1,14 +1,25 @@
 (function ($) {
+    "use strict";
+    $.fn.explode = function (opt) {
+        if (!opt || typeof opt !== "object") {
+            opt = {};
+        }
 
-    $.fn.explode = function ({
-        minWidth = 3,
-        maxWidth,
-        omitLastLine = true,
-        radius = 8,
-        release = true,
-        recycle = true,
-        fill = true,
-    }) {
+        const {
+            minWidth = 3,
+                omitLastLine = false,
+                radius = 8,
+                release = true,
+                recycle = true,
+                fill = true,
+                explodeTime = 300,
+                maxAngle = 360,
+        } = opt;
+
+        let {
+            maxWidth
+        } = opt;
+
         const $target = this;
         const args = arguments;
         $target.each(function () { //explode separately
@@ -29,31 +40,31 @@
         const minorDimension = Math.min(w, h);
         let background;
 
-        if ($target.prop('tagName') === 'IMG') {
+        if ($target.prop("tagName") === "IMG") {
             background = {
-                kind: 'image',
-                src: $target.attr('src'),
+                kind: "image",
+                src: $target.attr("src"),
             };
         } else {
             background = {
-                kind: 'color',
-                color: $target.css('background-color'),
+                kind: "color",
+                color: $target.css("background-color"),
             };
         }
 
         if (!maxWidth) {
             maxWidth = minorDimension / 4;
         }
-        const $wrapper = $('<div></div>', {
-            "class": 'explode-wrapper',
+        const $wrapper = $("<div></div>", {
+            "class": "explode-wrapper",
         });
-        const syncStyles = ['width', 'height', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'position', 'top', 'right', 'bottom', 'left',"float"];
+        const syncStyles = ["width", "height", "margin-top", "margin-right", "margin-bottom", "margin-left", "position", "top", "right", "bottom", "left", "float", "display"];
         syncStyles.forEach((v) => {
             $wrapper.css(v, $target.css(v));
         });
         //        $wrapper.css("background-color", "black");
-        if ($wrapper.css('position') === 'static') {
-            $wrapper.css('position', 'relative');
+        if ($wrapper.css("position") === "static") {
+            $wrapper.css("position", "relative");
         }
         const targetDisplay = $target.css("display");
 
@@ -73,10 +84,9 @@
             }
             let width;
             const rags = [];
-            const ret = [];
-            for (let row = 0; row < rowCnt; row++) {
+
+            function generateRow(row) {
                 let rowSum = 0;
-                let column = 0;
                 const topBase = row * maxWidth;
 
                 function generate(width) {
@@ -100,33 +110,34 @@
                 do {
                     if (width) {
                         generate(width);
-                        column++;
                     }
                     width = random(minWidth, maxWidth);
                 } while (w > rowSum + width);
                 if (w - rowSum >= minWidth) {
                     generate(w - rowSum);
                 }
-
+            }
+            for (let row = 0; row < rowCnt; row++) {
+                generateRow(row);
             }
             return rags;
         }
         const rags = generateRags();
-        let ragTop = 0;
+
 
         function setContent($dom) {
             switch (background.kind) {
-            case 'image':
-                $dom.css('background-image', `url("${background.src}")`);
+            case "image":
+                $dom.css("background-image", `url("${background.src}")`);
                 break;
-            case 'color':
-                $dom.css('background-color', `${background.color}`);
+            case "color":
+                $dom.css("background-color", `${background.color}`);
                 break;
             default:
             }
         }
         rags.forEach((rag) => {
-            const $dom = $('<div></div>', {});
+            const $dom = $("<div></div>", {});
             const {
                 left,
                 top,
@@ -136,11 +147,12 @@
             $dom.css({
                 width,
                 height: width,
-                position: 'absolute',
+                position: "absolute",
                 left,
                 top,
-                'background-size': `${w}px ${h}px`,
-                'background-position': `${-left}px ${-top}px`,
+                "background-repeat": "no-repeat",
+                "background-size": `${w}px ${h}px`,
+                "background-position": `${-left}px ${-top}px`,
             });
             setContent($dom);
             rag.$dom = $dom;
@@ -148,13 +160,10 @@
         });
 
         let remainCnt = rags.length;
-        const degMax = 720;
         rags.forEach((v, i) => {
-            v.$dom.css('transition', '0.3s all ease-out');
+            v.$dom.css("transition", `${explodeTime}ms all ease-out`);
 
-            const rand1 = (Math.random() + 2) * v.width;
-
-            v.finalAngle = (((Math.random() * degMax) - (degMax / 2)) / ((Math.random() + 2) * v.width)) * 10;
+            v.finalAngle = (((Math.random() * maxAngle * 2) - maxAngle) / ((Math.random() + 2) * v.width)) * 10;
             //            rand=Math.max(rand,3)
 
             //coordinate based on center point
@@ -169,8 +178,7 @@
             }
 
             const distance = Math.sqrt(x * x + y * y);
-            const startRatio = 0.3;
-            const width = v.width;
+            const startRatio = 0.3;            
 
             const ratio = ((1 - startRatio) * (1 - v.width / maxWidth) + startRatio) * Math.random();
             const distanceResult = (radius - distance) * ratio + distance;
@@ -185,7 +193,7 @@
                             v.$dom.remove();
                             remainCnt--;
                             if (!remainCnt) {
-                                //                                $target.css("display",targetDisplay);
+                                $target.css("display", targetDisplay);
                                 $target.fadeIn();
                                 $wrapper.remove();
                             }
@@ -195,25 +203,37 @@
             }
         });
 
-        rags[0].$dom.on("transitionstart", function () {
-            console.log(1)
-        });
         $target.hide();
         $target.after($wrapper);
         $wrapper.css({
-            'background-size': `${w}px ${h}px`,
-            'background-position': `${0}px ${0}px`,
+            "background-size": `${w}px ${h}px`,
+            "background-position": `${0}px ${0}px`,
         });
         setContent($wrapper);
         setTimeout(function () {
 
             for (let i in rags) {
                 const rag = rags[i];
-                rag.$dom.css('transform', `translate(${rag.translateX}px,${rag.translateY}px) rotate(${rag.finalAngle}deg)`);
+                rag.$dom.css("transform", `translate(${rag.translateX}px,${rag.translateY}px) rotate(${rag.finalAngle}deg)`);
             }
             setTimeout(function () {
                 $wrapper.css("background-image", "none");
+                if (recycle) {
+                    setTimeout(function () {
+
+                        for (let i in rags) {
+                            const rag = rags[i];
+                            rag.$dom.css("transform", "");
+                        }
+                        setTimeout(function () {
+                            $target.show();
+                            $wrapper.hide();
+                        }, explodeTime);
+                    }, explodeTime * 2);
+                }
+
             });
-        });
+        }, 100);
+
     };
-})(jQuery);
+})(window.jQuery);

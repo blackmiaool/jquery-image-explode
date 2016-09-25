@@ -1,33 +1,35 @@
 {
-  "name": "jquery-image-explode",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/blackmiaool/jquery-image-explode.git"
-  },
-  "keywords": [
+    "name": "jquery-image-explode",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "eslint": "./node_modules/.bin/eslint jquery.imgexplode.js --cache --fix"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/blackmiaool/jquery-image-explode.git"
+    },
+    "keywords": [
     "jquery",
     "image",
     "explode"
   ],
-  "author": "blackmiaool",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/blackmiaool/jquery-image-explode/issues"
-  },
-  "homepage": "https://github.com/blackmiaool/jquery-image-explode#readme",
-  "devDependencies": {
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-less": "^3.1.0",
-    "gulp-livereload": "^3.8.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-uglify": "^2.0.0",
-    "less": "^2.7.1"
-  }
+    "author": "blackmiaool",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/blackmiaool/jquery-image-explode/issues"
+    },
+    "homepage": "https://github.com/blackmiaool/jquery-image-explode#readme",
+    "devDependencies": {
+        "eslint": "^3.6.0",
+        "gulp": "^3.9.1",
+        "gulp-babel": "^6.1.2",
+        "gulp-less": "^3.1.0",
+        "gulp-livereload": "^3.8.1",
+        "gulp-rename": "^1.2.2",
+        "gulp-uglify": "^2.0.0",
+        "less": "^2.7.1"
+    }
 }

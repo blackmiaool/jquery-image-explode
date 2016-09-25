@@ -12,22 +12,22 @@ function get_babel_params() {
         presets: ['es2015'],
     }
 }
-gulp.task('default', function() {
-    var babel_pipe = babel(get_babel_params());
-    babel_pipe.on('error', function(e) {
+gulp.task('default', function () {
+    let babel_pipe = babel(get_babel_params());
+    babel_pipe.on('error', function (e) {
         gutil.log(e);
         babel_pipe.end();
     });
 
-    return gulp.src(['index.js'])
+    return gulp.src(['jquery.imgexplode.js'])
         .pipe(babel_pipe)
         .pipe(uglify())
-        .pipe(rename(function(path) {
+        .pipe(rename(function (path) {
             path.basename += ".min";
         }))
-        .pipe(gulp.dest('.'))
+        .pipe(gulp.dest('dist'))
         .pipe(livereload())
 });
 livereload.listen();
-gulp.watch('index.js', ['default']);
+gulp.watch('./*.js', ['default']);
 gulp.watch('index.html', ['default']);
