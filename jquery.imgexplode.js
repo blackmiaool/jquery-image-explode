@@ -161,29 +161,33 @@
                     return;
                 ctx.clearRect(0, 0, ctxWidth, ctxHeight)
                 ratio = Math.sin(ratio * Math.PI / 2);
-
+                
                 rags.forEach((rag, i) => {
-
+                    
                     const {
                         left,
                         top,
                         width: ragWidth,
                         height: ragHeight,
                     } = rag;
-
+                    ctx.save();
                     ctx = $canvas[0].getContext("2d");
-
+                    
                     switch (background.kind) {
                     case "image":
                         //                        console.log(...rag.naturalParams, (ctxWidth - w) / 2 + left, (ctxHeight - h) / 2 + top, ragWidth, ragHeight);
-                        ctx.drawImage($target[0], ...rag.naturalParams, (ctxWidth - w) / 2 + rag.translateX * ratio + left, (ctxHeight - h) / 2 + rag.translateY * ratio + top, ragWidth, ragHeight);
+                        ctx.translate((ctxWidth - w) / 2 + rag.translateX * ratio + left+rag.width/2,(ctxHeight - h) / 2 + rag.translateY * ratio + top+rag.height/2);
+                        ctx.rotate((Math.PI/180)*rag.finalAngle*ratio);                        
+                        ctx.drawImage($target[0], ...rag.naturalParams,-ragWidth/2, -ragHeight/2, ragWidth, ragHeight);
                         break;
                     case "color":
                         //                    $dom.css("background-color", `${background.color}`);
                         break;
                     default:
                     }
+                    ctx.restore();
                 });
+                
                 //                if(ratio<1){
                 window.requestAnimationFrame(draw);
                 //                }
