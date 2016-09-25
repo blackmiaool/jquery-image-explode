@@ -47,7 +47,7 @@
         const $wrapper = $('<div></div>', {
             "class": 'explode-wrapper',
         });
-        const syncStyles = ['width', 'height', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'position', 'top', 'right', 'bottom', 'left'];
+        const syncStyles = ['width', 'height', 'margin-top', 'margin-right', 'margin-bottom', 'margin-left', 'position', 'top', 'right', 'bottom', 'left',"float"];
         syncStyles.forEach((v) => {
             $wrapper.css(v, $target.css(v));
         });
