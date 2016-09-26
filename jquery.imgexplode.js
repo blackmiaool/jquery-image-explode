@@ -15,6 +15,7 @@
                 explodeTime = 300,
                 maxAngle = 360,
                 canvas = true,
+                gravity = false,
         } = opt;
 
         let {
@@ -50,7 +51,8 @@
                 color: $target.css("background-color"),
             };
         }
-
+        const ctxWidth = Math.max(w, radius * 2);
+        const ctxHeight = Math.max(h, radius * 2);
         if (!maxWidth) {
             maxWidth = minorDimension / 4;
         }
@@ -79,8 +81,7 @@
             naturalHeight
         } = $target[0];
         //generate rags' body
-        const ctxWidth = Math.max(w, radius * 2);
-        const ctxHeight = Math.max(h, radius * 2);
+
         if (canvas) {
             $canvas = $("<canvas></canvas>");
             $canvas.css({
@@ -108,7 +109,7 @@
                     height: ragHeight,
                 } = rag;
 
-                ctx = $canvas[0].getContext("2d");                
+                ctx = $canvas[0].getContext("2d");
                 rag.naturalParams = [left / scaleX, top / scaleY, ragWidth / scaleX, ragHeight / scaleY];
                 switch (background.kind) {
                 case "image":
@@ -149,21 +150,139 @@
 
 
         let remainCnt = rags.length;
+        $target.hide();
+        $target.after($wrapper);
         if (canvas) {
+            explodeCanvas(afterExplode);
+        } else {
+            explodeDom(afterExplode);
+        }
+
+
+
+        function afterExplode(cb) {
             const time0 = Date.now();
-            window.requestAnimationFrame(draw);
+            if (canvas) {
+
+                if (gravity) {
+                    let vy = 0;
+                    let ybias = 0;
+
+                    let lastTime = time0;
+                    let leftCnt = rags.length;
+                    draw();
+
+                    function draw() {
+                        const time = Date.now();
+
+                        let ratio = (time - lastTime) / explodeTime;
+                        lastTime = time;
+                        if (ratio > 1) {
+                            cb && cb();
+                            return;
+                        }
+                        ybias += (vy * ratio);
+                        //                        console.log(ratio,vy*ratio);
+                        ctx.clearRect(0, 0, ctxWidth, ctxHeight)
+                        ratio = Math.sin(ratio * Math.PI / 2);
+
+                        rags.forEach((rag, i) => {
+                            let yb = ybias;
+                            let transYMax = ctxHeight - rag.height / 2;
+                            if (rag.translateY0 + rag.translateY + ybias > transYMax) {
+                                if (!rag.land) {
+                                    rag.land = 1;
+                                    leftCnt--;
+                                }                               
+                                yb = transYMax - rag.translateY - rag.translateY0;
+                            }
+                            //                            console.log(1)
+                            const {
+                                left,
+                                top,
+                                width: ragWidth,
+                                height: ragHeight,
+                            } = rag;
+                            ctx.save();
+
+                            switch (background.kind) {
+                            case "image":
+                                ctx.translate(rag.translateX0 + rag.translateX, rag.translateY0 + rag.translateY + yb);
+                                ctx.rotate(rag.finalAngleRad);
+                                ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+                                break;
+                            case "color":
+                                break;
+                            default:
+                            }
+                            ctx.restore();
+                        });
+                        vy += 10 * gravity;
+                        if (leftCnt) {
+                            window.requestAnimationFrame(draw);
+                        }
+
+                    }
+                }
+
+
+
+            } else {
+
+
+
+                setTimeout(function () {
+
+                    if (recycle) {
+                        setTimeout(function () {
+
+                            for (let i in rags) {
+                                const rag = rags[i];
+                                rag.$dom.css("transform", "");
+                            }
+                            setTimeout(function () {
+                                $target.show();
+                                $wrapper.hide();
+                            }, explodeTime);
+                        }, explodeTime * 2);
+                    }
+
+                });
+            }
+        }
+
+
+
+
+        function setContent($dom) {
+            switch (background.kind) {
+            case "image":
+                $dom.css("background-image", `url("${background.src}")`);
+                break;
+            case "color":
+                $dom.css("background-color", `${background.color}`);
+                break;
+            default:
+            }
+        }
+
+        function explodeCanvas(cb) {
+            const time0 = Date.now();
+            draw();
 
             function draw() {
                 const time = Date.now();
-                
+
                 let ratio = (time - time0) / explodeTime;
-                if (ratio > 1)
+                if (ratio > 1) {
+                    cb && cb();
                     return;
+                }
                 ctx.clearRect(0, 0, ctxWidth, ctxHeight)
                 ratio = Math.sin(ratio * Math.PI / 2);
-                
+
                 rags.forEach((rag, i) => {
-                    
+
                     const {
                         left,
                         top,
@@ -171,29 +290,24 @@
                         height: ragHeight,
                     } = rag;
                     ctx.save();
-                    ctx = $canvas[0].getContext("2d");
-                    
                     switch (background.kind) {
+
                     case "image":
-                        //                        console.log(...rag.naturalParams, (ctxWidth - w) / 2 + left, (ctxHeight - h) / 2 + top, ragWidth, ragHeight);
-                        ctx.translate((ctxWidth - w) / 2 + rag.translateX * ratio + left+rag.width/2,(ctxHeight - h) / 2 + rag.translateY * ratio + top+rag.height/2);
-                        ctx.rotate((Math.PI/180)*rag.finalAngle*ratio);                        
-                        ctx.drawImage($target[0], ...rag.naturalParams,-ragWidth/2, -ragHeight/2, ragWidth, ragHeight);
+                        ctx.translate(rag.translateX0 + rag.translateX * ratio, rag.translateY0 + rag.translateY * ratio);
+                        ctx.rotate(rag.finalAngleRad * ratio);
+                        ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
                         break;
                     case "color":
-                        //                    $dom.css("background-color", `${background.color}`);
                         break;
                     default:
                     }
                     ctx.restore();
                 });
-                
-                //                if(ratio<1){
                 window.requestAnimationFrame(draw);
-                //                }
-
             }
-        } else {
+        }
+
+        function explodeDom(cb) {
             rags.forEach((v, i) => {
                 v.$dom.css("transition", `${explodeTime}ms all ease-out`);
                 const {
@@ -204,8 +318,6 @@
                     ratio
                 } = v;
 
-                //                v.translateX = (finalDistance - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1);
-                //                v.translateY = (finalDistance - distance) * Math.sqrt((distanceSquare - x * x) / (distanceSquare)) * (y > 0 ? 1 : -1);
                 if (release) {
                     setTimeout(() => {
                         v.$dom.fadeOut({
@@ -222,59 +334,26 @@
                     }, 3000 / ratio);
                 }
             });
-        }
-
-        $target.hide();
-        $target.after($wrapper);
-
-        if (canvas) {
-
-        } else {
             $wrapper.css({
                 "background-size": `${w}px ${h}px`,
                 "background-position": `${0}px ${0}px`,
             });
             setContent($wrapper);
-            setTimeout(function () {
 
+            setTimeout(function () {
                 for (let i in rags) {
                     const rag = rags[i];
                     rag.$dom.css("transform", `translate(${rag.translateX}px,${rag.translateY}px) rotate(${rag.finalAngle}deg)`);
                 }
                 setTimeout(function () {
                     $wrapper.css("background-image", "none");
-                    if (recycle) {
-                        setTimeout(function () {
-
-                            for (let i in rags) {
-                                const rag = rags[i];
-                                rag.$dom.css("transform", "");
-                            }
-                            setTimeout(function () {
-                                $target.show();
-                                $wrapper.hide();
-                            }, explodeTime);
-                        }, explodeTime * 2);
-                    }
-
+                    setTimeout(function () {
+                        cb && cb();
+                    }, explodeTime);
                 });
             }, 100);
+
         }
-
-
-
-        function setContent($dom) {
-            switch (background.kind) {
-            case "image":
-                $dom.css("background-image", `url("${background.src}")`);
-                break;
-            case "color":
-                $dom.css("background-color", `${background.color}`);
-                break;
-            default:
-            }
-        }
-
 
         function random(min, max) {
             return parseInt(Math.random() * (max + 1 - min), 10) + min;
@@ -283,7 +362,8 @@
         //generate final position and angle of rags
         function getRagsFinalState() {
             rags.forEach((v, i) => {
-                v.finalAngle = (((Math.random() * maxAngle * 2) - maxAngle) / ((Math.random() + 2) * v.width)) * 10;
+                const finalAngle = (((Math.random() * maxAngle * 2) - maxAngle) / ((Math.random() + 2) * v.width)) * 10;
+                const finalAngleRad = finalAngle * (Math.PI / 180);
 
                 //coordinate based on center point
                 let x = v.left + v.width / 2 - w / 2;
@@ -304,6 +384,8 @@
                 const distanceSquare = distance * distance;
                 const translateX = (finalDistance - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1);
                 const translateY = (finalDistance - distance) * Math.sqrt((distanceSquare - x * x) / (distanceSquare)) * (y > 0 ? 1 : -1);
+                const translateX0 = (ctxWidth - w) / 2 + v.left + v.width / 2;
+                const translateY0 = (ctxHeight - h) / 2 + v.top + v.height / 2;
                 Object.assign(v, {
                     finalDistance,
                     ratio,
@@ -311,7 +393,11 @@
                     y,
                     distance,
                     translateX,
-                    translateY
+                    translateY,
+                    translateX0,
+                    translateY0,
+                    finalAngleRad,
+                    finalAngle,
                 });
             })
         }
