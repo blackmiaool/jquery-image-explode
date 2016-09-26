@@ -1,7 +1,7 @@
 (function ($) {
     "use strict";
-    var wrapperName="explode-wrapper";
-    $.fn.explodeRestore=function(){
+    var wrapperName = "explode-wrapper";
+    $.fn.explodeRestore = function () {
         this.each(function () { //explode separately
             const $dom = $(this);
             $dom.show();
@@ -12,11 +12,12 @@
         if (!opt || typeof opt !== "object") {
             opt = {};
         }
-        
+
         const {
             minWidth = 3,
                 omitLastLine = false,
-                radius = 8,
+                radius = 80,
+                minRadius=20,
                 release = true,
                 recycle = true,
                 fill = true,
@@ -36,7 +37,7 @@
             const $dom = $(this);
             if ($dom.prop("tagName") === "IMG") {
                 if (!$dom.prop("complete")) {
-                    
+
                     $dom.on("load", function () {
                         $dom.explode.apply($dom, args);
                     });
@@ -172,6 +173,7 @@
         function afterExplode(cb) {
             const time0 = Date.now();
             if (canvas) {
+                return;
                 if (gravity) {
                     let vy = 0;
                     let ybias = 0;
@@ -201,7 +203,7 @@
                                 if (!rag.land) {
                                     rag.land = 1;
                                     leftCnt--;
-                                }                               
+                                }
                                 yb = transYMax - rag.translateY - rag.translateY0;
                             }
                             //                            console.log(1)
@@ -276,7 +278,69 @@
 
         function explodeCanvas(cb) {
             const time0 = Date.now();
-            draw();
+            let lastTime = time0;
+            let leftCnt = rags.length;
+            let biasVy = 0;
+
+            if (gravity) {
+                rags.forEach((rag, i) => {
+                    rag.vx = rag.translateX / explodeTime*1000;
+                    rag.vy = rag.translateY / explodeTime*1000;
+                    
+                    rag.biasx = rag.translateX0;
+                    rag.biasy = rag.translateY0;
+                    rag.transYMax = ctxHeight - rag.height / 2;
+                })
+                drawGravity();
+            } else {
+                draw();
+            }
+
+            function drawGravity() {
+                const time = Date.now();
+                let ratio = (time - lastTime) / 1000/1;
+                lastTime = time;
+
+                biasVy += (gravity * ratio)*3000;
+
+                ctx.clearRect(0, 0, ctxWidth, ctxHeight)
+
+                rags.forEach((rag, i) => {
+                    rag.biasx += rag.vx * ratio;
+                    rag.biasy += (rag.vy + biasVy) * ratio;
+
+
+                    if (rag.biasy > rag.transYMax) {
+                        if (!rag.land) {
+                            rag.land = 1;
+                            leftCnt--;
+                            rag.vx=0;
+                            rag.vy=0;
+                        }
+                        rag.biasy = rag.transYMax;
+                    }
+                    //                            console.log(1)
+                    const {
+                        left,
+                        top,
+                        width: ragWidth,
+                        height: ragHeight,
+                    } = rag;
+                    ctx.save();
+
+
+                    ctx.translate(rag.biasx, rag.biasy);
+                    ctx.rotate(rag.finalAngleRad);
+                    ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+
+
+                    ctx.restore();
+                });
+                //                vy += 10 * gravity;
+                if (leftCnt) {
+                    window.requestAnimationFrame(drawGravity);
+                }
+            }
 
             function draw() {
                 const time = Date.now();
@@ -298,21 +362,16 @@
                         height: ragHeight,
                     } = rag;
                     ctx.save();
-                    switch (background.kind) {
 
-                    case "image":
-                        ctx.translate(rag.translateX0 + rag.translateX * ratio, rag.translateY0 + rag.translateY * ratio);
-                        ctx.rotate(rag.finalAngleRad * ratio);
-                        ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
-                        break;
-                    case "color":
-                        break;
-                    default:
-                    }
+                    ctx.translate(rag.translateX0 + rag.translateX * ratio, rag.translateY0 + rag.translateY * ratio);
+                    ctx.rotate(rag.finalAngleRad * ratio);
+                    ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+
                     ctx.restore();
                 });
                 window.requestAnimationFrame(draw);
             }
+
         }
 
         function explodeDom(cb) {
@@ -387,7 +446,8 @@
                 const distance = Math.sqrt(x * x + y * y);
 
 
-                const ratio = ((1 - startRatio) * (1 - v.width / maxWidth) + startRatio) * Math.random();
+                let ratio = ((1 - startRatio) * (1 - (v.width-minWidth) / (maxWidth-minWidth)) + startRatio) * Math.random();
+                ratio=1-(1-ratio)*(1-minRadius/radius);
                 const finalDistance = (radius - distance) * ratio + distance;
                 const distanceSquare = distance * distance;
                 const translateX = (finalDistance - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1);

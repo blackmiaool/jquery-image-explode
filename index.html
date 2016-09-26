@@ -14,7 +14,8 @@
     <img src="try-jquery.jpg" style="display:inline-block;margin-top:200px;margin-bottom:10px;width:277px;" />
     <button style="position:fixed;right:0;top:0;width:100px;height:50px;" onclick="explode()">Explode</button>
     <script src="jquery-3.1.0.js"></script>
-    <script src="dist/jquery.imgexplode.min.js"></script>
+<!--    <script src="dist/jquery.imgexplode.min.js"></script>-->
+    <script src="jquery.imgexplode.js"></script>
     <script>
         function explode() {
             $("img").explodeRestore();
@@ -28,7 +29,7 @@
                     explodeTime: 400,
                     canvas: true,
                     maxAngle: 360,
-                    gravity:2,
+                    gravity:true,
                 });
             }, 300)
         }
