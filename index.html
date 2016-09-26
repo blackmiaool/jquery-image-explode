@@ -17,10 +17,8 @@
     <script src="dist/jquery.imgexplode.min.js"></script>
     <script>
         function explode() {
-            $(".explode-wrapper").remove();
-            $("img").show()
-            setTimeout(function () {
-                
+            $("img").explodeRestore();
+            setTimeout(function () {                
                 $("img").explode({
                     maxWidth: 12,
                     minWidth: 3,
@@ -30,13 +28,10 @@
                     explodeTime: 400,
                     canvas: true,
                     maxAngle: 360,
-                    gravity:10,
+                    gravity:2,
                 });
             }, 300)
         }
-        $("img").on("click", function () {
-            explode();
-        });
         explode();
     </script>
 </body>

@@ -1,10 +1,18 @@
 (function ($) {
     "use strict";
+    var wrapperName="explode-wrapper";
+    $.fn.explodeRestore=function(){
+        this.each(function () { //explode separately
+            const $dom = $(this);
+            $dom.show();
+            $dom.next().filter(`.${wrapperName}`).remove();
+        });
+    }
     $.fn.explode = function (opt) {
         if (!opt || typeof opt !== "object") {
             opt = {};
         }
-
+        
         const {
             minWidth = 3,
                 omitLastLine = false,
@@ -28,6 +36,7 @@
             const $dom = $(this);
             if ($dom.prop("tagName") === "IMG") {
                 if (!$dom.prop("complete")) {
+                    
                     $dom.on("load", function () {
                         $dom.explode.apply($dom, args);
                     });
@@ -57,7 +66,7 @@
             maxWidth = minorDimension / 4;
         }
         const $wrapper = $("<div></div>", {
-            "class": "explode-wrapper",
+            "class": wrapperName,
         });
         const syncStyles = ["width", "height", "margin-top", "margin-right", "margin-bottom", "margin-left", "position", "top", "right", "bottom", "left", "float", "display"];
         syncStyles.forEach((v) => {
