@@ -163,7 +163,6 @@
         function afterExplode(cb) {
             const time0 = Date.now();
             if (canvas) {
-
                 if (gravity) {
                     let vy = 0;
                     let ybias = 0;
