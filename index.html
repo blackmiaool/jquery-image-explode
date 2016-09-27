@@ -11,11 +11,11 @@
 
 <body style="margin:0;text-align:center;">
    <a target="_blank" href="https://github.com/blackmiaool/jquery-image-explode" style="position: absolute;top: 0;left: 0;width: 138px;height: 138px;display: block;background: transparent url(./fork.png) 0 0 no-repeat;text-indent: -9000px;z-index: 3;"></a>
-    <img src="try-jquery.jpg" style="display:inline-block;margin-top:200px;margin-bottom:10px;width:277px;" />
-    <button style="position:fixed;right:0;top:0;width:100px;height:50px;" onclick="explode()">Explode</button>
-    <script src="jquery-3.1.0.js"></script>
+    <img src="try-jquery.jpg" style="display:inline-block;margin-top:300px;margin-bottom:10px;width:277px;" />
+    <button style="position:fixed;right:0;top:0;width:100px;height:50px;">Explode</button>
+    <script src="lib/jquery-3.1.0.js"></script>
 <!--    <script src="dist/jquery.imgexplode.min.js"></script>-->
-    <script src="jquery.imgexplode.js"></script>
+    <script src="dist/jquery.imgexplode.min.js"></script>
     <script>
         function explode() {
             $("img").explodeRestore();
@@ -23,17 +23,21 @@
                 $("img").explode({
                     maxWidth: 12,
                     minWidth: 3,
-                    radius: 331,
+                    radius: 231,                    
                     release: false,
                     recycle: false,
-                    explodeTime: 400,
+                    explodeTime: 320,
                     canvas: true,
+                    round:false,
                     maxAngle: 360,
-                    gravity:true,
+                    gravity:1,
                 });
             }, 300)
         }
         explode();
+        $("button").on("click",function(){
+            explode();
+        });
     </script>
 </body>
 

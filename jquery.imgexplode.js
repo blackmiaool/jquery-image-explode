@@ -17,7 +17,7 @@
             minWidth = 3,
                 omitLastLine = false,
                 radius = 80,
-                minRadius=20,
+                minRadius = 20,
                 release = true,
                 recycle = true,
                 fill = true,
@@ -25,6 +25,7 @@
                 maxAngle = 360,
                 canvas = true,
                 gravity = false,
+                round = false,
         } = opt;
 
         let {
@@ -121,15 +122,7 @@
 
                 ctx = $canvas[0].getContext("2d");
                 rag.naturalParams = [left / scaleX, top / scaleY, ragWidth / scaleX, ragHeight / scaleY];
-                switch (background.kind) {
-                case "image":
-                    ctx.drawImage($target[0], ...rag.naturalParams, (ctxWidth - w) / 2 + left, (ctxHeight - h) / 2 + top, ragWidth, ragHeight);
-                    break;
-                case "color":
-                    //                    $dom.css("background-color", `${background.color}`);
-                    break;
-                default:
-                }
+
             });
         } else {
             rags.forEach((rag) => {
@@ -215,16 +208,13 @@
                             } = rag;
                             ctx.save();
 
-                            switch (background.kind) {
-                            case "image":
-                                ctx.translate(rag.translateX0 + rag.translateX, rag.translateY0 + rag.translateY + yb);
-                                ctx.rotate(rag.finalAngleRad);
-                                ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
-                                break;
-                            case "color":
-                                break;
-                            default:
-                            }
+
+                            ctx.translate(rag.translateX0 + rag.translateX, rag.translateY0 + rag.translateY + yb);
+                            ctx.rotate(rag.finalAngleRad);
+
+                            ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+
+
                             ctx.restore();
                         });
                         vy += 10 * gravity;
@@ -284,9 +274,9 @@
 
             if (gravity) {
                 rags.forEach((rag, i) => {
-                    rag.vx = rag.translateX / explodeTime*1000;
-                    rag.vy = rag.translateY / explodeTime*1000;
-                    
+                    rag.vx = rag.translateX / explodeTime * 1000;
+                    rag.vy = rag.translateY / explodeTime * 1000;
+
                     rag.biasx = rag.translateX0;
                     rag.biasy = rag.translateY0;
                     rag.transYMax = ctxHeight - rag.height / 2;
@@ -298,10 +288,10 @@
 
             function drawGravity() {
                 const time = Date.now();
-                let ratio = (time - lastTime) / 1000/1;
+                let ratio = (time - lastTime) / 1000 / 1;
                 lastTime = time;
 
-                biasVy += (gravity * ratio)*3000;
+                biasVy += (gravity * ratio) * 3000;
 
                 ctx.clearRect(0, 0, ctxWidth, ctxHeight)
 
@@ -314,29 +304,36 @@
                         if (!rag.land) {
                             rag.land = 1;
                             leftCnt--;
-                            rag.vx=0;
-                            rag.vy=0;
+                            rag.vx = 0;
+                            rag.vy = 0;
                         }
                         rag.biasy = rag.transYMax;
                     }
-                    //                            console.log(1)
+
                     const {
                         left,
                         top,
                         width: ragWidth,
                         height: ragHeight,
                     } = rag;
-                    ctx.save();
 
+                    ctx.save();
 
                     ctx.translate(rag.biasx, rag.biasy);
                     ctx.rotate(rag.finalAngleRad);
+                    if (round) {
+
+                        ctx.beginPath();
+                        ctx.arc(0, 0, ragWidth / 2, 0, Math.PI * 2, false);
+                        ctx.closePath();
+                        ctx.clip();
+                    }
                     ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
 
 
                     ctx.restore();
                 });
-                //                vy += 10 * gravity;
+
                 if (leftCnt) {
                     window.requestAnimationFrame(drawGravity);
                 }
@@ -446,15 +443,15 @@
                 const distance = Math.sqrt(x * x + y * y);
 
 
-                let ratio = ((1 - startRatio) * (1 - (v.width-minWidth) / (maxWidth-minWidth)) + startRatio) * Math.random();
-                ratio=1-(1-ratio)*(1-minRadius/radius);
+                let ratio = ((1 - startRatio) * (1 - (v.width - minWidth) / (maxWidth - minWidth)) + startRatio) * Math.random();
+                ratio = 1 - (1 - ratio) * (1 - minRadius / radius);
                 const finalDistance = (radius - distance) * ratio + distance;
                 const distanceSquare = distance * distance;
                 const translateX = (finalDistance - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1);
                 const translateY = (finalDistance - distance) * Math.sqrt((distanceSquare - x * x) / (distanceSquare)) * (y > 0 ? 1 : -1);
                 const translateX0 = (ctxWidth - w) / 2 + v.left + v.width / 2;
                 const translateY0 = (ctxHeight - h) / 2 + v.top + v.height / 2;
-                Object.assign(v, {
+                const attach = {
                     finalDistance,
                     ratio,
                     x,
@@ -466,7 +463,14 @@
                     translateY0,
                     finalAngleRad,
                     finalAngle,
-                });
+                };
+                if (Object.assign) {
+                    Object.assign(v, attach);
+                } else {
+                    for (var i in attach) {
+                        v[i] = attach[i];
+                    }
+                }
             })
         }
         //generate inital position and dimension of rags
