@@ -12,15 +12,15 @@ const settings = {
         title: "Delay time of exploding after adjusting params(ms)",
         min: 100,
         max: 3000,
-        value: 500,
+        value: 0,
+        initValue: 500,
     },
     imageUrl: {
         name: "imageUrl",
         type: "string",
         title: "You can use base64 image",
-        min: 1,
-        max: 100,
-        value: 12
+        value: "../try-jquery.jpg",
+        initValue: "../try-jquery.jpg",
     },
 };
 const params = [
@@ -30,7 +30,8 @@ const params = [
         title: "Minimum rag size",
         min: 1,
         max: 100,
-        value: 3
+        value: 0,
+        initValue: 3,
     },
     {
         name: "maxWidth",
@@ -38,7 +39,8 @@ const params = [
         title: "Maximum rag size(px)",
         min: 1,
         max: 100,
-        value: 12
+        value: 0,
+        initValue: 12,
     },
     {
         name: "radius",
@@ -46,19 +48,22 @@ const params = [
         title: "Explode radius(px)",
         min: 50,
         max: 300,
-        value: 235,
+        value: 0,
+        initValue: 235,
     },
     {
         name: "release",
         type: "boolean",
         title: "If release rags after explosion",
         value: false,
+        initValue: false,
     },
     {
         name: "recycle",
         type: "boolean",
         title: "If recycle rags after explosion",
         value: false,
+        initValue: false,
     },
     {
         name: "explodeTime",
@@ -66,19 +71,22 @@ const params = [
         title: "The time during the explosion",
         min: 50,
         max: 1000,
-        value: 231,
+        value: 0,
+        initValue: 231,
     },
     {
         name: "canvas",
         type: "boolean",
         title: "If use canvas",
         value: true,
+        initValue: true,
     },
     {
         name: "round",
         type: "boolean",
         title: "If use round rags",
         value: false,
+        initValue: false,
     },
     {
         name: "minAngle",
@@ -87,6 +95,7 @@ const params = [
         min: 0,
         max: 5000,
         value: 0,
+        initValue: 0,
     },
     {
         name: "maxAngle",
@@ -94,7 +103,8 @@ const params = [
         title: "The maximum angle rags rotate",
         min: 0,
         max: 1000,
-        value: 360,
+        value: 0,
+        initValue: 360,
     },
     {
         name: "gravity",
@@ -102,34 +112,37 @@ const params = [
         title: "If enable gravity effect",
         min: 0,
         max: 30,
-        value: 10,
+        value: 0,
+        initValue: 10,
     },
 ];
-ng.controller("RootController", ["$scope", "$rootScope", function (sp, rsp) {
+ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (sp, rsp, $timeout) {
 
     function explode() {
         $("img").explodeRestore();
-        setTimeout(function () {
+        $timeout(function () {
             let p = {};
             params.forEach(function (v) {
+                let value;
                 if (v.type === "number") {
-                    v.value = parseInt(v.value);
+                    value = parseInt(v.value);
                 }
-                p[v.name] = v.value;
+                p[v.name] = value;
             });
 
             console.log(p);
             $("img").explode(p);
         }, 600);
     }
-    function timeoutFunc(){
+
+    function timeoutFunc() {
         timeout = 0;
         explode();
     }
     let timeout;
-//    let timeout = setTimeout(timeoutFunc, settings.previewDelay.value);
-    sp.$watch("params", function (v,p) {
-        if(JSON.stringify(v)===JSON.stringify(p)){
+    //    let timeout = setTimeout(timeoutFunc, settings.previewDelay.value);
+    sp.$watch("params", function (v, p) {
+        if (JSON.stringify(v) === JSON.stringify(p)) {
             return;
         }
 
@@ -138,9 +151,19 @@ ng.controller("RootController", ["$scope", "$rootScope", function (sp, rsp) {
         }
         timeout = setTimeout(timeoutFunc, settings.previewDelay.value);
     }, true);
+
+    function setDefaultValue(obj) {
+        for (var i in obj) {
+            obj[i].value = obj[i].initValue;
+        }
+    }
+    $timeout(function () {
+        setDefaultValue(settings);
+        setDefaultValue(params);
+    });
     extend(sp, {
         explode,
         params,
         settings
-    })
+    });
 }]);
