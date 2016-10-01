@@ -141,7 +141,7 @@ ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (s
     }
     let timeout;
     //    let timeout = setTimeout(timeoutFunc, settings.previewDelay.value);
-    sp.$watch("params", function (v, p) {
+    function update(v, p){
         if (JSON.stringify(v) === JSON.stringify(p)) {
             return;
         }
@@ -150,7 +150,9 @@ ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (s
             clearTimeout(timeout);
         }
         timeout = setTimeout(timeoutFunc, settings.previewDelay.value);
-    }, true);
+    }
+    sp.$watch("params", update, true);
+    sp.$watch("settings", update, true);
 
     function setDefaultValue(obj) {
         for (var i in obj) {
