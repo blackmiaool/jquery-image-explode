@@ -5,7 +5,7 @@
         this.each(function () { //explode separately
             const $dom = $(this);
             $dom.show();
-            $dom.next().filter(`.${wrapperName}`).remove();
+            $dom.siblings().filter(`.${wrapperName}`).remove();
         });
     }
     $.fn.explode = function (opt) {
@@ -24,7 +24,7 @@
                 explodeTime = 300,
                 maxAngle = 360,
                 canvas = true,
-                gravity = false,
+                gravity = 0,
                 round = false,
         } = opt;
 
@@ -217,7 +217,7 @@
 
                             ctx.restore();
                         });
-                        vy += 10 * gravity;
+                        vy += gravity;
                         if (leftCnt) {
                             window.requestAnimationFrame(draw);
                         }
@@ -291,7 +291,7 @@
                 let ratio = (time - lastTime) / 1000 / 1;
                 lastTime = time;
 
-                biasVy += (gravity * ratio) * 3000;
+                biasVy += (gravity * ratio) * 300;
 
                 ctx.clearRect(0, 0, ctxWidth, ctxHeight)
 

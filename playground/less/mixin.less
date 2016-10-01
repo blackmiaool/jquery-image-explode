@@ -1,0 +1,137 @@
+@import "prefix.less";
+.unselectable {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -o-user-select: none;
+    user-select: none;
+}
+
+
+.clickable {
+    .unselectable;
+    >* {
+        .unselectable;
+    }
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+img {
+    .unselectable;
+}
+
+.caret(@size) {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: @size;
+    vertical-align: middle;
+    border-top: @size*2 solid;
+    border-right: @size*2 solid transparent;
+    border-left: @size*2 solid transparent;
+    vertical-align: middle;
+    margin: 0px;
+}
+
+.fill {
+    height: 100%;
+    width: 100%;
+}
+
+.abs-fill {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+.trans {
+    .transition(-webkit-transform 400ms);
+    .transition(-moz-transform 400ms);
+    .transition(-ms-transform 400ms);
+    .transition(-o-transform 400ms);
+    .transition(transform 400ms);
+}
+
+.hide {
+    display: none !important;
+}
+
+*[data-show="1"] {}
+
+*[data-show="0"] {
+    .hide;
+}
+
+.square(@size) {
+    width: @size;
+    height: @size;
+}
+
+.common-square(@size) {
+    width: @size;
+    height: @size;
+}
+
+.bg(@location) {
+    background-image: url("@{res-folder}/@{location}");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.round {
+    border-radius: 10000px;
+    overflow: hidden;
+}
+
+.round(@size) {
+    .square(@size);
+    border-radius: 10000px;
+    overflow: hidden;
+}
+
+.square-crop(@size) {
+    position: absolute;
+    top: @size;
+    right: @size;
+    bottom: @size;
+    left: @size;
+}
+
+.transform-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    .transform(translate(-50%,
+    -50%));
+}
+
+.vertical-center {
+    position: absolute;
+    top: 50%;
+    .transform(translateY(-50%));
+}
+
+.horizontal-center {
+    position: absolute;
+    left: 50%;
+    .transform(translateX(-50%));
+}
+
+.blue-panel {
+    background-color: rgba(70, 130, 180, 0.25);
+    border-radius: 10px;
+    border: rgb(70, 130, 180) 1px solid;
+}
+
+.pure-line(@size) {
+    font-size: @size;
+    line-height: @size;
+    height: @size;
+}
+
+.bold {
+    font-weight: bold;
+}

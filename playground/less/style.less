@@ -1,0 +1,104 @@
+@import "mixin.less";
+#fork-ad {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 138px;
+    height: 138px;
+    display: block;
+    background: transparent url(../../fork.png) 0 0 no-repeat;
+    text-indent: -9000px;
+    z-index: 3;
+}
+
+* {
+    outline: none !important;
+}
+
+#wrap {
+    position: relative;
+    margin: auto;
+    @bodyWidth: 1000px;
+    max-width: @bodyWidth;
+    display: flex;
+    flex-direction: row;
+    >.left {
+        flex: 1;
+        margin-right: 30px;
+        .preview-wrap {
+            padding-bottom: 100%;
+            position: relative;
+        }
+        .preview {
+            .abs-fill;
+            border: 1px solid #aaa;
+            margin: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            canvas {
+                //              background-color: #ccc;  
+            }
+            a {}
+            img {
+                display: inline-block;
+                width: 277px;
+            }
+        }
+        .mode {
+            .explode {}
+            .btn.btn-primary {}
+        }
+        .code {}
+    }
+    >.right {
+        flex: 1;
+    }
+    .control {
+        padding: 15px;
+        header {
+            text-align: left;
+            margin-bottom: 3px;
+            .name {
+                font-weight: bold;
+                margin-right: 5px;
+            }
+            .descr {
+                color: #555;
+            }
+        }
+        section {
+            margin-bottom: 10px;
+        }
+        label {
+            font-weight: normal;
+        }
+        .range-content {
+            overflow: auto;
+            .input-wrap {
+                margin-right: 50px;
+                input {
+                    margin-right: 30px;
+                }
+            }
+            label {
+                font-size: 18px;
+                float: right;
+            }
+        }
+        .checkbox-content {
+            text-align: left;
+            input {
+                .square(18px);
+                vertical-align: bottom;
+                margin-left: 10px;
+            }
+            header {
+                display: inline-block;
+            }
+            main {
+                display: inline-block;
+            }
+        }
+    }
+}

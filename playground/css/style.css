@@ -1,0 +1,186 @@
+.unselectable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.clickable {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+.clickable > * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+img {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+.fill {
+  height: 100%;
+  width: 100%;
+}
+.abs-fill {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+}
+.trans {
+  transition: -webkit-transform 400ms;
+  transition: -moz-transform 400ms;
+  transition: -ms-transform 400ms;
+  transition: -o-transform 400ms;
+  transition: transform 400ms;
+}
+.hide {
+  display: none !important;
+}
+*[data-show="0"] {
+  display: none !important;
+}
+.round {
+  border-radius: 10000px;
+  overflow: hidden;
+}
+.transform-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+}
+.vertical-center {
+  position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+.horizontal-center {
+  position: absolute;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  -ms-transform: translateX(-50%);
+  transform: translateX(-50%);
+}
+.blue-panel {
+  background-color: rgba(70, 130, 180, 0.25);
+  border-radius: 10px;
+  border: #4682b4 1px solid;
+}
+.bold {
+  font-weight: bold;
+}
+#fork-ad {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 138px;
+  height: 138px;
+  display: block;
+  background: transparent url(../../fork.png) 0 0 no-repeat;
+  text-indent: -9000px;
+  z-index: 3;
+}
+* {
+  outline: none !important;
+}
+#wrap {
+  position: relative;
+  margin: auto;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: row;
+}
+#wrap > .left {
+  flex: 1;
+  margin-right: 30px;
+}
+#wrap > .left .preview-wrap {
+  padding-bottom: 100%;
+  position: relative;
+}
+#wrap > .left .preview {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  margin: auto;
+  border: 1px solid #aaa;
+  margin: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#wrap > .left .preview img {
+  display: inline-block;
+  width: 277px;
+}
+#wrap > .right {
+  flex: 1;
+}
+#wrap .control {
+  padding: 15px;
+}
+#wrap .control header {
+  text-align: left;
+  margin-bottom: 3px;
+}
+#wrap .control header .name {
+  font-weight: bold;
+  margin-right: 5px;
+}
+#wrap .control header .descr {
+  color: #555;
+}
+#wrap .control section {
+  margin-bottom: 10px;
+}
+#wrap .control label {
+  font-weight: normal;
+}
+#wrap .control .range-content {
+  overflow: auto;
+}
+#wrap .control .range-content .input-wrap {
+  margin-right: 50px;
+}
+#wrap .control .range-content .input-wrap input {
+  margin-right: 30px;
+}
+#wrap .control .range-content label {
+  font-size: 18px;
+  float: right;
+}
+#wrap .control .checkbox-content {
+  text-align: left;
+}
+#wrap .control .checkbox-content input {
+  width: 18px;
+  height: 18px;
+  vertical-align: bottom;
+  margin-left: 10px;
+}
+#wrap .control .checkbox-content header {
+  display: inline-block;
+}
+#wrap .control .checkbox-content main {
+  display: inline-block;
+}

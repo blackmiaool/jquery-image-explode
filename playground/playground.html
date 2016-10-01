@@ -1,0 +1,98 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta id="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, minimum-scale=1,  user-scalable=no,minimal-ui" name="viewport">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="format-detection" content="telephone=no">
+    <title>爆炸测试</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="../lib/jquery-3.1.0.js"></script>
+    <script src="../jquery.imgexplode.js"></script>
+    <!--    <script src="dist/jquery.imgexplode.min.js"></script>-->
+    <script src="../lib/angular.min.js"></script>
+    <script src="dist/playground.min.js"></script>
+</head>
+
+<body style="margin:0;text-align:center;" ng-app="app" ng-controller="RootController">
+    <a id="fork-ad" target="_blank" href="https://github.com/blackmiaool/jquery-image-explode"></a>
+
+    <div id="wrap">
+        <div class="left panel panel-default">
+            <div class="panel-heading">Effect</div>
+            <div class="preview-wrap">
+                <div class="preview">
+
+                    <img src="../try-jquery.jpg"  />
+                </div>
+            </div>
+
+            <div class="mode control">
+                <button ng-click="explode()" class="explode btn btn-danger">Explode</button>
+                <section ng-repeat="param in settings">
+
+
+                    <div class="range-content" ng-if="param.type==='number'">
+                        <header><span class="name" ng-bind="param.name"></span>(<span class="descr" ng-bind="param.title"></span>)</header>
+                        <main>
+                            <label ng-bind="param.value"></label>
+                            <div class="input-wrap">
+                                <input step="1" ng-model="param.value" type="range" max="{{param.max}}"  min="{{param.min}}">
+                            </div>
+                        </main>
+                    </div>
+                    <div class="checkbox-content" ng-if="param.type==='boolean'">
+                        <header><span class="name" ng-bind="param.name"></span>(<span class="descr" ng-bind="param.title"></span>)</header>
+                        <main>
+                            <div class="input-wrap">
+                                <input ng-model="param.value" type="checkbox" >
+                            </div>
+                        </main>
+                    </div>
+                    <div class="string-content" ng-if="param.type==='string'">
+                        <header><span class="name" ng-bind="param.name"></span>(<span class="descr" ng-bind="param.title"></span>)</header>
+                        <main>
+                            <div class="input-wrap">
+                                <input ng-model="param.value" type="text">
+                            </div>
+                        </main>
+                    </div>
+
+                </section>
+            </div>
+            <div class="code"></div>
+        </div>
+        <div class="right panel panel-primary">
+            <div class="panel-heading">Params</div>
+            <div class="control panel-body">
+                <section ng-repeat="param in params">
+
+
+                    <div class="range-content" ng-if="param.type==='number'" >
+                        <header><span class="name" ng-bind="param.name"></span>(<span class="descr" ng-bind="param.title"></span>)</header>
+                        <main>
+                            <label ng-bind="param.value"></label>
+                            <div class="input-wrap">
+                                <input ng-model="param.value" type="range" max="{{param.max}}" min="{{param.min}}">
+                            </div>
+                        </main>
+                    </div>
+                    <div class="checkbox-content" ng-if="param.type==='boolean'">
+                        <header><span class="name" ng-bind="param.name"></span>(<span class="descr" ng-bind="param.title"></span>)</header>
+                        <main>
+                            <div class="input-wrap">
+                                <input ng-model="param.value" type="checkbox">
+                            </div>
+                        </main>
+                    </div>
+
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
