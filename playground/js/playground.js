@@ -1,3 +1,4 @@
+const baseAddr=`http://blackmiaool.com/jquery-image-explode/playground/playground.html`;
 var ng = angular.module("app", []);
 
 function extend(dest, src) {
@@ -128,7 +129,7 @@ const params = [
 ];
 let initValue = location.href.split("?")[1];
 if (initValue) {
-    console.log(initValue)
+//    console.log(initValue)
     initValue = JSON.parse(decodeURIComponent(initValue));
     params.forEach(function (v, i) {
         if (!initValue.params.hasOwnProperty(v.name))
@@ -139,8 +140,8 @@ if (initValue) {
         settings[i].initValue = initValue.settings[i];
     }
 }
-console.log(settings, params)
-console.log(initValue)
+//console.log(settings, params)
+//console.log(initValue)
 
 function explode() {
     $("img").explodeRestore();
@@ -171,13 +172,10 @@ function generateEffectUrl() {
         result.settings[i] = settings[i].value;
     }
 
-    result = location.href.split("?")[0] + "?" + encodeURIComponent(JSON.stringify(result));
+    result = baseAddr + "?" + encodeURIComponent(JSON.stringify(result));
     effectUrl.value = result;
 }
 ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (sp, rsp, $timeout) {
-
-
-
 
     let timeout;
 
