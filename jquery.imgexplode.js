@@ -93,61 +93,38 @@
         } = $target[0];
         //generate rags' body
 
-        if (canvas) {
-            $canvas = $("<canvas></canvas>");
-            $canvas.css({
-                position: "absolute",
-                left: -ctxWidth / 2,
-                right: -ctxWidth / 2,
-                top: -ctxHeight / 2,
-                bottom: -ctxHeight / 2,
-                margin: "auto",
-                width: ctxWidth,
-                height: ctxHeight,
-            });
-            $canvas.attr({
-                width: ctxWidth,
-                height: ctxHeight,
-            })
-            $wrapper.append($canvas);
-            const scaleX = w / naturalWidth;
-            const scaleY = h / naturalHeight;
-            rags.forEach((rag, i) => {
-                const {
-                    left,
-                    top,
-                    width: ragWidth,
-                    height: ragHeight,
-                } = rag;
 
-                ctx = $canvas[0].getContext("2d");
-                rag.naturalParams = [left / scaleX, top / scaleY, ragWidth / scaleX, ragHeight / scaleY];
+        $canvas = $("<canvas></canvas>");
+        $canvas.css({
+            position: "absolute",
+            left: -ctxWidth / 2,
+            right: -ctxWidth / 2,
+            top: -ctxHeight / 2,
+            bottom: -ctxHeight / 2,
+            margin: "auto",
+            width: ctxWidth,
+            height: ctxHeight,
+        });
+        $canvas.attr({
+            width: ctxWidth,
+            height: ctxHeight,
+        })
+        $wrapper.append($canvas);
+        const scaleX = w / naturalWidth;
+        const scaleY = h / naturalHeight;
+        rags.forEach((rag, i) => {
+            const {
+                left,
+                top,
+                width: ragWidth,
+                height: ragHeight,
+            } = rag;
 
-            });
-        } else {
-            rags.forEach((rag) => {
-                const $dom = $("<div></div>", {});
-                const {
-                    left,
-                    top,
-                    width
-                } = rag;
+            ctx = $canvas[0].getContext("2d");
+            rag.naturalParams = [left / scaleX, top / scaleY, ragWidth / scaleX, ragHeight / scaleY];
 
-                $dom.css({
-                    width,
-                    height: width,
-                    position: "absolute",
-                    left,
-                    top,
-                    "background-repeat": "no-repeat",
-                    "background-size": `${w}px ${h}px`,
-                    "background-position": `${-left}px ${-top}px`,
-                });
-                setContent($dom);
-                rag.$dom = $dom;
-                $wrapper.append($dom);
-            });
-        }
+        });
+
 
 
 
@@ -155,100 +132,73 @@
         let remainCnt = rags.length;
         $target.hide();
         $target.after($wrapper);
-        if (canvas) {
-            explodeCanvas(afterExplode);
-        } else {
-            explodeDom(afterExplode);
-        }
+
+        explodeCanvas(afterExplode);
 
 
 
         function afterExplode(cb) {
             const time0 = Date.now();
-            if (canvas) {
-                return;
-                if (gravity) {
-                    let vy = 0;
-                    let ybias = 0;
 
-                    let lastTime = time0;
-                    let leftCnt = rags.length;
-                    draw();
+            return;
+            if (gravity) {
+                let vy = 0;
+                let ybias = 0;
 
-                    function draw() {
-                        const time = Date.now();
+                let lastTime = time0;
+                let leftCnt = rags.length;
+                draw();
 
-                        let ratio = (time - lastTime) / explodeTime;
-                        lastTime = time;
-                        if (ratio > 1) {
-                            cb && cb();
-                            return;
-                        }
-                        ybias += (vy * ratio);
-                        //                        console.log(ratio,vy*ratio);
-                        ctx.clearRect(0, 0, ctxWidth, ctxHeight)
-                        ratio = Math.sin(ratio * Math.PI / 2);
+                function draw() {
+                    const time = Date.now();
 
-                        rags.forEach((rag, i) => {
-                            let yb = ybias;
-                            let transYMax = ctxHeight - rag.height / 2;
-                            if (rag.translateY0 + rag.translateY + ybias > transYMax) {
-                                if (!rag.land) {
-                                    rag.land = 1;
-                                    leftCnt--;
-                                }
-                                yb = transYMax - rag.translateY - rag.translateY0;
-                            }
-                            //                            console.log(1)
-                            const {
-                                left,
-                                top,
-                                width: ragWidth,
-                                height: ragHeight,
-                            } = rag;
-                            ctx.save();
-
-
-                            ctx.translate(rag.translateX0 + rag.translateX, rag.translateY0 + rag.translateY + yb);
-                            ctx.rotate(rag.finalAngleRad);
-
-                            ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
-
-
-                            ctx.restore();
-                        });
-                        vy += gravity;
-                        if (leftCnt) {
-                            window.requestAnimationFrame(draw);
-                        }
-
+                    let ratio = (time - lastTime) / explodeTime;
+                    lastTime = time;
+                    if (ratio > 1) {
+                        cb && cb();
+                        return;
                     }
+                    ybias += (vy * ratio);
+                    //                        console.log(ratio,vy*ratio);
+                    ctx.clearRect(0, 0, ctxWidth, ctxHeight)
+                    ratio = Math.sin(ratio * Math.PI / 2);
+
+                    rags.forEach((rag, i) => {
+                        let yb = ybias;
+                        let transYMax = ctxHeight - rag.height / 2;
+                        if (rag.translateY0 + rag.translateY + ybias > transYMax) {
+                            if (!rag.land) {
+                                rag.land = 1;
+                                leftCnt--;
+                            }
+                            yb = transYMax - rag.translateY - rag.translateY0;
+                        }
+                        //                            console.log(1)
+                        const {
+                            left,
+                            top,
+                            width: ragWidth,
+                            height: ragHeight,
+                        } = rag;
+                        ctx.save();
+
+
+                        ctx.translate(rag.translateX0 + rag.translateX, rag.translateY0 + rag.translateY + yb);
+                        ctx.rotate(rag.finalAngleRad);
+
+                        ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+
+
+                        ctx.restore();
+                    });
+                    vy += gravity;
+                    if (leftCnt) {
+                        window.requestAnimationFrame(draw);
+                    }
+
                 }
-
-
-
-            } else {
-
-
-
-                setTimeout(function () {
-
-                    if (recycle) {
-                        setTimeout(function () {
-
-                            for (let i in rags) {
-                                const rag = rags[i];
-                                rag.$dom.css("transform", "");
-                            }
-                            setTimeout(function () {
-                                $target.show();
-                                $wrapper.hide();
-                            }, explodeTime);
-                        }, explodeTime * 2);
-                    }
-
-                });
             }
+
         }
 
 
@@ -368,54 +318,6 @@
                 });
                 window.requestAnimationFrame(draw);
             }
-
-        }
-
-        function explodeDom(cb) {
-            rags.forEach((v, i) => {
-                v.$dom.css("transition", `${explodeTime}ms all ease-out`);
-                const {
-                    finalDistance,
-                    x,
-                    y,
-                    distance,
-                    ratio
-                } = v;
-
-                if (release) {
-                    setTimeout(() => {
-                        v.$dom.fadeOut({
-                            done: function () {
-                                v.$dom.remove();
-                                remainCnt--;
-                                if (!remainCnt) {
-                                    $target.css("display", targetDisplay);
-                                    $target.fadeIn();
-                                    $wrapper.remove();
-                                }
-                            },
-                        });
-                    }, 3000 / ratio);
-                }
-            });
-            $wrapper.css({
-                "background-size": `${w}px ${h}px`,
-                "background-position": `${0}px ${0}px`,
-            });
-            setContent($wrapper);
-
-            setTimeout(function () {
-                for (let i in rags) {
-                    const rag = rags[i];
-                    rag.$dom.css("transform", `translate(${rag.translateX}px,${rag.translateY}px) rotate(${rag.finalAngle}deg)`);
-                }
-                setTimeout(function () {
-                    $wrapper.css("background-image", "none");
-                    setTimeout(function () {
-                        cb && cb();
-                    }, explodeTime);
-                });
-            }, 100);
 
         }
 
