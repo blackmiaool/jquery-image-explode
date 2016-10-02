@@ -23,9 +23,9 @@
                 fill = true,
                 explodeTime = 300,
                 maxAngle = 360,
-                canvas = true,
                 gravity = 0,
                 round = false,
+                groundDistance = 400,
         } = opt;
 
         let {
@@ -63,7 +63,7 @@
             };
         }
         const ctxWidth = Math.max(w, radius * 2);
-        const ctxHeight = Math.max(h, radius * 2);
+        const ctxHeight = Math.max(h, radius * 2, groundDistance * 2);
         if (!maxWidth) {
             maxWidth = minorDimension / 4;
         }
@@ -140,8 +140,8 @@
         function afterExplode(cb) {
             const time0 = Date.now();
 
-            return;
             if (gravity) {
+                return;
                 let vy = 0;
                 let ybias = 0;
 
@@ -150,6 +150,7 @@
                 draw();
 
                 function draw() {
+                    console.log("d");
                     const time = Date.now();
 
                     let ratio = (time - lastTime) / explodeTime;
@@ -165,7 +166,7 @@
 
                     rags.forEach((rag, i) => {
                         let yb = ybias;
-                        let transYMax = ctxHeight - rag.height / 2;
+                        let transYMax = ctxHeight / 2 + groundDistance - rag.height / 2;
                         if (rag.translateY0 + rag.translateY + ybias > transYMax) {
                             if (!rag.land) {
                                 rag.land = 1;
@@ -217,106 +218,100 @@
         }
 
         function explodeCanvas(cb) {
-            const time0 = Date.now();
-            let lastTime = time0;
+            const startTime = Date.now();
+            let lastTime = startTime;
             let leftCnt = rags.length;
             let biasVy = 0;
 
-            if (gravity) {
-                rags.forEach((rag, i) => {
-                    rag.vx = rag.translateX / explodeTime * 1000;
-                    rag.vy = rag.translateY / explodeTime * 1000;
+            rags.forEach((rag, i) => {
+                rag.vx = rag.translateX / explodeTime * 1000;
+                rag.vy = rag.translateY / explodeTime * 1000;
 
-                    rag.biasx = rag.translateX0;
-                    rag.biasy = rag.translateY0;
-                    rag.transYMax = ctxHeight - rag.height / 2;
-                })
-                drawGravity();
-            } else {
-                draw();
-            }
+                rag.biasx = rag.translateX0;
+                rag.biasy = rag.translateY0;
+                rag.transYMax = ctxHeight / 2 + groundDistance - rag.height / 2;
+            })
+            draw();
+
 
             function drawGravity() {
                 const time = Date.now();
-                let ratio = (time - lastTime) / 1000 / 1;
-                lastTime = time;
 
-                biasVy += (gravity * ratio) * 300;
+            }
 
-                ctx.clearRect(0, 0, ctxWidth, ctxHeight)
-
-                rags.forEach((rag, i) => {
-                    rag.biasx += rag.vx * ratio;
-                    rag.biasy += (rag.vy + biasVy) * ratio;
-
-
-                    if (rag.biasy > rag.transYMax) {
-                        if (!rag.land) {
-                            rag.land = 1;
-                            leftCnt--;
-                            rag.vx = 0;
-                            rag.vy = 0;
-                        }
-                        rag.biasy = rag.transYMax;
+            function draw() {
+                const time = Date.now();
+                let ratio;
+                let angleRatio;
+                if (gravity) {
+                    ratio = (time - lastTime) / 1000;                    
+                    biasVy += (gravity * ratio) * 300;                    
+                    angleRatio = (time - startTime) / explodeTime;
+                } else {
+                    ratio = (time - startTime) / explodeTime;
+                    if (ratio > 1) {
+                        cb && cb();
+                        return;
                     }
-
+                    ratio = Math.sin(ratio * Math.PI / 2);
+                    angleRatio = ratio;
+                }
+                lastTime = time;
+                ctx.clearRect(0, 0, ctxWidth, ctxHeight)
+                rags.forEach((rag) => {
+                    ctx.save();
+                    
                     const {
                         left,
                         top,
                         width: ragWidth,
                         height: ragHeight,
                     } = rag;
-
-                    ctx.save();
-
+                    
+                    if (gravity) {
+                        if (!rag.land) {
+                            rag.biasx += rag.vx * ratio;
+                            rag.biasy += (rag.vy + biasVy) * ratio;
+                            if (rag.biasy > rag.transYMax) {
+                                leftCnt--;
+                                rag.land = true;
+                                rag.lastAngle = rag.finalAngleRad * angleRatio;
+                                rag.biasy = rag.transYMax;
+                            }
+                        }
+                    } else {
+                        rag.biasx = rag.translateX0 + rag.translateX * ratio;
+                        rag.biasy = rag.translateY0 + rag.translateY * ratio;
+                    }
+                    
                     ctx.translate(rag.biasx, rag.biasy);
-                    ctx.rotate(rag.finalAngleRad);
+                    
+                    if (rag.lastAngle) {
+                        ctx.rotate(rag.lastAngle);
+                    } else {
+                        ctx.rotate(rag.finalAngleRad * angleRatio);
+                    }
+                    
                     if (round) {
-
                         ctx.beginPath();
                         ctx.arc(0, 0, ragWidth / 2, 0, Math.PI * 2, false);
                         ctx.closePath();
                         ctx.clip();
                     }
+                    
                     ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
-
-
                     ctx.restore();
                 });
-
-                if (leftCnt) {
-                    window.requestAnimationFrame(drawGravity);
+                if (gravity) {
+                    if (leftCnt) {
+                        window.requestAnimationFrame(draw);
+                    } else {
+                        cb();
+                    }
+                } else {
+                    window.requestAnimationFrame(draw);
                 }
-            }
 
-            function draw() {
-                const time = Date.now();
-
-                let ratio = (time - time0) / explodeTime;
-                if (ratio > 1) {
-                    cb && cb();
-                    return;
-                }
-                ctx.clearRect(0, 0, ctxWidth, ctxHeight)
-                ratio = Math.sin(ratio * Math.PI / 2);
-
-                rags.forEach((rag, i) => {
-
-                    const {
-                        left,
-                        top,
-                        width: ragWidth,
-                        height: ragHeight,
-                    } = rag;
-                    ctx.save();
-
-                    ctx.translate(rag.translateX0 + rag.translateX * ratio, rag.translateY0 + rag.translateY * ratio);
-                    ctx.rotate(rag.finalAngleRad * ratio);
-                    ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
-
-                    ctx.restore();
-                });
-                window.requestAnimationFrame(draw);
             }
 
         }

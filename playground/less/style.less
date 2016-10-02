@@ -14,10 +14,9 @@
 * {
     outline: none !important;
 }
-textarea{
-    word-break: break-all;
-}
+
 #wrap {
+    align-items: baseline;
     position: relative;
     margin: auto;
     @bodyWidth: 1000px;
@@ -33,6 +32,8 @@ textarea{
         }
         .preview {
             .abs-fill;
+            .clickable;
+            overflow: hidden;
             border: 1px solid #aaa;
             margin: 5px;
             display: flex;
@@ -44,10 +45,17 @@ textarea{
             a {}
             img {
                 display: inline-block;
-//                width: 277px;
+                //                width: 277px;
             }
         }
-        .mode {            
+        .mode {
+            .share {
+                text-align: left;
+            }
+            textarea {
+                word-break: break-all;
+                height: 80px;
+            }
             .explode {
                 margin-bottom: 10px;
             }

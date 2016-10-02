@@ -101,10 +101,8 @@ img {
 * {
   outline: none !important;
 }
-textarea {
-  word-break: break-all;
-}
 #wrap {
+  align-items: baseline;
   position: relative;
   margin: auto;
   max-width: 1000px;
@@ -126,14 +124,36 @@ textarea {
   top: 0;
   bottom: 0;
   margin: auto;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  overflow: hidden;
   border: 1px solid #aaa;
   margin: 5px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
+#wrap > .left .preview > * {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
 #wrap > .left .preview img {
   display: inline-block;
+}
+#wrap > .left .mode .share {
+  text-align: left;
+}
+#wrap > .left .mode textarea {
+  word-break: break-all;
+  height: 80px;
 }
 #wrap > .left .mode .explode {
   margin-bottom: 10px;

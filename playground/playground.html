@@ -24,7 +24,7 @@
         <div class="left panel panel-default">
             <div class="panel-heading">Effect</div>
             <div class="preview-wrap">
-                <div class="preview">
+                <div class="preview"  ng-click="explode()">
 
                     <img ng-src="{{settings.imageUrl.value}}" />
                 </div>
@@ -63,8 +63,8 @@
 
 
                 </section>
-                <div class="string-content">
-                    <header><span class="name" ng-bind="effectUrl.name"></span>(<span class="descr" ng-bind="effectUrl.title"></span>)</header>
+                <div class="share">
+                    <a ng-href="{{effectUrl.value}}" target="_blank"><span class="name" ng-bind="effectUrl.name"></span>(<span class="descr" ng-bind="effectUrl.title"></span>)</a>
                     <main>
                         <div class="input-wrap">
                             <textarea class="form-control" ng-model="effectUrl.value" type="text"></textarea>

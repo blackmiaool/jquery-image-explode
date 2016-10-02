@@ -83,13 +83,6 @@ const params = [
         initValue: 231,
     },
     {
-        name: "canvas",
-        type: "boolean",
-        title: "If use canvas",
-        value: true,
-        initValue: true,
-    },
-    {
         name: "round",
         type: "boolean",
         title: "If use round rags",
@@ -123,20 +116,32 @@ const params = [
         value: 0,
         initValue: 10,
     },
+    {
+        name: "groundDistance",
+        type: "number",
+        title: "Distance between center and ground",
+        min: 0,
+        max: 235,
+        value: 0,
+        initValue: 235,
+    },
 ];
-let initValue=location.href.split("?")[1];
-if(initValue){
+let initValue = location.href.split("?")[1];
+if (initValue) {
     console.log(initValue)
-    initValue=JSON.parse(decodeURIComponent(initValue));
-    params.forEach(function(v,i){
-        v.initValue=initValue.params[v.name];
+    initValue = JSON.parse(decodeURIComponent(initValue));
+    params.forEach(function (v, i) {
+        if (!initValue.params.hasOwnProperty(v.name))
+            return;
+        v.initValue = initValue.params[v.name];
     });
-    for(var i in settings){
-        settings[i].initValue=initValue.settings[i];
+    for (var i in settings) {
+        settings[i].initValue = initValue.settings[i];
     }
 }
-console.log(settings,params)
+console.log(settings, params)
 console.log(initValue)
+
 function explode() {
     $("img").explodeRestore();
     setTimeout(function () {
@@ -152,6 +157,22 @@ function explode() {
         });
         $("img").explode(finalParams);
     }, 600);
+}
+
+function generateEffectUrl() {
+    let result = {
+        settings: {},
+        params: {}
+    };
+    for (var i in params) {
+        result.params[params[i].name] = params[i].value;
+    }
+    for (var i in settings) {
+        result.settings[i] = settings[i].value;
+    }
+
+    result = location.href.split("?")[0] + "?" + encodeURIComponent(JSON.stringify(result));
+    effectUrl.value = result;
 }
 ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (sp, rsp, $timeout) {
 
@@ -174,21 +195,7 @@ ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (s
         }, settings.previewDelay.value);
     }
 
-    function generateEffectUrl() {
-        let result = {
-            settings: {},
-            params: {}
-        };
-        for (var i in params) {
-            result.params[params[i].name] = params[i].value;
-        }
-        for (var i in settings) {
-            result.settings[i] = settings[i].value;
-        }
-        
-        result=location.href.split("?")[0]+"?"+encodeURIComponent(JSON.stringify(result));
-        effectUrl.value=result;
-    }
+
     sp.$watch("params", update, true);
     sp.$watch("settings", update, true);
 
