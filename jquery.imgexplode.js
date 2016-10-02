@@ -243,35 +243,33 @@
                 const time = Date.now();
                 let ratio;
                 let angleRatio;
+                ratio = (time - lastTime) / 1000;
+                angleRatio = (time - startTime) / explodeTime;
                 if (gravity) {
-                    ratio = (time - lastTime) / 1000;                    
-                    biasVy += (gravity * ratio) * 300;                    
-                    angleRatio = (time - startTime) / explodeTime;
+                    biasVy += (gravity * ratio) * 300;
                 } else {
-                    ratio = (time - startTime) / explodeTime;
-                    if (ratio > 1) {
+                    if (angleRatio > 1) {
                         cb && cb();
                         return;
-                    }
-                    ratio = Math.sin(ratio * Math.PI / 2);
-                    angleRatio = ratio;
+                    }                    
+                    ratio *= Math.cos(angleRatio * Math.PI / 2) * Math.PI / 2;
                 }
                 lastTime = time;
                 ctx.clearRect(0, 0, ctxWidth, ctxHeight)
                 rags.forEach((rag) => {
                     ctx.save();
-                    
                     const {
                         left,
                         top,
                         width: ragWidth,
                         height: ragHeight,
                     } = rag;
-                    
-                    if (gravity) {
-                        if (!rag.land) {
-                            rag.biasx += rag.vx * ratio;
-                            rag.biasy += (rag.vy + biasVy) * ratio;
+
+                    if (!rag.land) {
+                        rag.biasx += rag.vx * ratio;
+                        rag.biasy += (rag.vy + biasVy) * ratio;
+
+                        if (gravity) {
                             if (rag.biasy > rag.transYMax) {
                                 leftCnt--;
                                 rag.land = true;
@@ -279,38 +277,32 @@
                                 rag.biasy = rag.transYMax;
                             }
                         }
-                    } else {
-                        rag.biasx = rag.translateX0 + rag.translateX * ratio;
-                        rag.biasy = rag.translateY0 + rag.translateY * ratio;
                     }
-                    
+
                     ctx.translate(rag.biasx, rag.biasy);
-                    
+
                     if (rag.lastAngle) {
                         ctx.rotate(rag.lastAngle);
                     } else {
                         ctx.rotate(rag.finalAngleRad * angleRatio);
                     }
-                    
+
                     if (round) {
                         ctx.beginPath();
                         ctx.arc(0, 0, ragWidth / 2, 0, Math.PI * 2, false);
                         ctx.closePath();
                         ctx.clip();
                     }
-                    
+
                     ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
                     ctx.restore();
                 });
-                if (gravity) {
-                    if (leftCnt) {
-                        window.requestAnimationFrame(draw);
-                    } else {
-                        cb();
-                    }
-                } else {
-                    window.requestAnimationFrame(draw);
+                if (gravity && !leftCnt) {
+                    cb();
+                }else{
+                    window.requestAnimationFrame(draw);    
                 }
+                
 
             }
 
