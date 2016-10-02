@@ -138,7 +138,7 @@
             }
         });
 
-        function doRelease() {
+        function doRelease(cb) {
             const startTime = Date.now();
             let leftCnt = rags.length;
             let fadeTime = 300;
@@ -188,7 +188,7 @@
                     ctx.restore();
                 });
                 if (!leftCnt) {
-                    cb();
+                    cb&&cb();
                 } else {
                     window.requestAnimationFrame(draw);
                 }
