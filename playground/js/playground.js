@@ -7,7 +7,6 @@ function extend(dest, src) {
 }
 const settings = {
     previewDelay: {
-        name: "previewDelay",
         type: "number",
         title: "Delay time of exploding after adjusting params(ms)",
         min: 100,
@@ -16,13 +15,22 @@ const settings = {
         initValue: 500,
     },
     imageUrl: {
-        name: "imageUrl",
         type: "string",
         title: "You can use base64 image",
         value: "../try-jquery.jpg",
         initValue: "../try-jquery.jpg",
     },
+
 };
+for (var i in settings) {
+    settings[i].name = i;
+}
+const effectUrl = {
+    name: "effectUrl",
+    type: "textarea",
+    title: "Share the effect",
+    value: location.href,
+}
 const params = [
     {
         name: "minWidth",
@@ -116,40 +124,70 @@ const params = [
         initValue: 10,
     },
 ];
+let initValue=location.href.split("?")[1];
+if(initValue){
+    console.log(initValue)
+    initValue=JSON.parse(decodeURIComponent(initValue));
+    params.forEach(function(v,i){
+        v.initValue=initValue.params[v.name];
+    });
+    for(var i in settings){
+        settings[i].initValue=initValue.settings[i];
+    }
+}
+console.log(settings,params)
+console.log(initValue)
+function explode() {
+    $("img").explodeRestore();
+    setTimeout(function () {
+        let finalParams = {};
+        params.forEach(function (v) {
+            let value;
+            if (v.type === "number") {
+                value = parseInt(v.value);
+            } else {
+                value = v.value;
+            }
+            finalParams[v.name] = value;
+        });
+        $("img").explode(finalParams);
+    }, 600);
+}
 ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (sp, rsp, $timeout) {
 
-    function explode() {
-        $("img").explodeRestore();
-        $timeout(function () {
-            let p = {};
-            params.forEach(function (v) {
-                let value;
-                if (v.type === "number") {
-                    value = parseInt(v.value);
-                }
-                p[v.name] = value;
-            });
 
-            console.log(p);
-            $("img").explode(p);
-        }, 600);
-    }
 
-    function timeoutFunc() {
-        timeout = 0;
-        explode();
-    }
+
     let timeout;
-    //    let timeout = setTimeout(timeoutFunc, settings.previewDelay.value);
-    function update(v, p){
+
+    function update(v, p) {
         if (JSON.stringify(v) === JSON.stringify(p)) {
             return;
         }
-
+        generateEffectUrl();
         if (timeout) {
             clearTimeout(timeout);
         }
-        timeout = setTimeout(timeoutFunc, settings.previewDelay.value);
+        timeout = setTimeout(function () {
+            timeout = 0;
+            explode();
+        }, settings.previewDelay.value);
+    }
+
+    function generateEffectUrl() {
+        let result = {
+            settings: {},
+            params: {}
+        };
+        for (var i in params) {
+            result.params[params[i].name] = params[i].value;
+        }
+        for (var i in settings) {
+            result.settings[i] = settings[i].value;
+        }
+        
+        result=location.href.split("?")[0]+"?"+encodeURIComponent(JSON.stringify(result));
+        effectUrl.value=result;
     }
     sp.$watch("params", update, true);
     sp.$watch("settings", update, true);
@@ -166,6 +204,7 @@ ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (s
     extend(sp, {
         explode,
         params,
-        settings
+        settings,
+        effectUrl
     });
 }]);

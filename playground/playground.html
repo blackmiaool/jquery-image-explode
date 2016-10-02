@@ -26,7 +26,7 @@
             <div class="preview-wrap">
                 <div class="preview">
 
-                    <img ng-src="{{settings.imageUrl.value}}"  />
+                    <img ng-src="{{settings.imageUrl.value}}" />
                 </div>
             </div>
 
@@ -40,7 +40,7 @@
                         <main>
                             <label ng-bind="param.value"></label>
                             <div class="input-wrap">
-                                <input step="1" ng-model="param.value" type="range" max="{{param.max}}"  min="{{param.min}}">
+                                <input step="1" ng-model="param.value" type="range" max="{{param.max}}" min="{{param.min}}">
                             </div>
                         </main>
                     </div>
@@ -48,7 +48,7 @@
                         <header><span class="name" ng-bind="param.name"></span>(<span class="descr" ng-bind="param.title"></span>)</header>
                         <main>
                             <div class="input-wrap">
-                                <input ng-model="param.value" type="checkbox" >
+                                <input ng-model="param.value" type="checkbox">
                             </div>
                         </main>
                     </div>
@@ -61,7 +61,16 @@
                         </main>
                     </div>
 
+
                 </section>
+                <div class="string-content">
+                    <header><span class="name" ng-bind="effectUrl.name"></span>(<span class="descr" ng-bind="effectUrl.title"></span>)</header>
+                    <main>
+                        <div class="input-wrap">
+                            <textarea class="form-control" ng-model="effectUrl.value" type="text"></textarea>
+                        </div>
+                    </main>
+                </div>
             </div>
             <div class="code"></div>
         </div>
@@ -71,7 +80,7 @@
                 <section ng-repeat="param in params">
 
 
-                    <div class="range-content" ng-if="param.type==='number'" >
+                    <div class="range-content" ng-if="param.type==='number'">
                         <header><span class="name" ng-bind="param.name"></span>(<span class="descr" ng-bind="param.title"></span>)</header>
                         <main>
                             <label ng-bind="param.value"></label>

@@ -49,9 +49,6 @@ gulp.task('playground-js', function () {
 
     return gulp.src(['playground/js/*'])
         .pipe(babel_pipe)
-        .pipe(rename(function (path) {
-            path.basename += ".min";
-        }))
         .pipe(gulp.dest('playground/dist'))
         .pipe(livereload())
 });

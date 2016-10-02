@@ -101,6 +101,9 @@ img {
 * {
   outline: none !important;
 }
+textarea {
+  word-break: break-all;
+}
 #wrap {
   position: relative;
   margin: auto;
@@ -131,7 +134,9 @@ img {
 }
 #wrap > .left .preview img {
   display: inline-block;
-  width: 277px;
+}
+#wrap > .left .mode .explode {
+  margin-bottom: 10px;
 }
 #wrap > .right {
   flex: 1;
