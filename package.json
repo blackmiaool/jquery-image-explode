@@ -1,7 +1,7 @@
 {
   "name": "jquery-image-explode",
   "version": "1.0.0",
-  "description": "",
+  "description": "A jQuery explosion plugin.",
   "main": "jquery.imgexplode.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
