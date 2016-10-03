@@ -1,3 +1,5 @@
 # jquery-image-explode
 #### A very simple demo
-[https://blackmiaool.com/jquery-image-explode](https://blackmiaool.com/jquery-image-explode)
+[http://blackmiaool.com/jquery-image-explode](http://blackmiaool.com/jquery-image-explode)
+#### Playground
+[http://blackmiaool.com/jquery-image-explode/playground.html](http://blackmiaool.com/jquery-image-explode/playground.html)
