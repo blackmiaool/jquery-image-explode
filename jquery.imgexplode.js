@@ -71,7 +71,7 @@
         if ($wrapper.css("position") === "static") {
             $wrapper.css("position", "relative");
         }
-        $wrapper.css("flex","0");
+
         const startRatio = 0.3;
 
 
