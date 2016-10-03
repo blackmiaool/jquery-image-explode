@@ -1,6 +1,6 @@
 {
   "name": "jquery-image-explode",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A jQuery explosion plugin.",
   "main": "jquery.imgexplode.js",
   "scripts": {

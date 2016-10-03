@@ -4,7 +4,7 @@
     $.fn.explodeRestore = function () {
         this.each(function () { //explode separately
             const $dom = $(this);
-            const wrapper = $dom.prop(wrapperName);           
+            const wrapper = $dom.prop(wrapperName);
             if (wrapper) {
                 wrapper.replaceWith($dom);
                 $dom.prop(wrapperName, null);
@@ -90,10 +90,10 @@
         $canvas = $("<canvas></canvas>");
         $canvas.css({
             position: "absolute",
-            left: -ctxWidth / 2,
-            right: -ctxWidth / 2,
-            top: -ctxHeight / 2,
-            bottom: -ctxHeight / 2,
+            left: (w-ctxWidth) / 2,
+            right: (w-ctxWidth) / 2,
+            top: (h - ctxHeight) / 2,
+            bottom: (h - ctxHeight) / 2,
             margin: "auto",
             width: ctxWidth,
             height: ctxHeight,
