@@ -154,9 +154,9 @@ if (initValue) {
 }
 //console.log(settings, params)
 //console.log(initValue)
-
+var $img = void 0;
 function explode() {
-    $("img").explodeRestore();
+    $img.explodeRestore();
     setTimeout(function () {
         var finalParams = {};
         params.forEach(function (v) {
@@ -168,7 +168,7 @@ function explode() {
             }
             finalParams[v.name] = value;
         });
-        $("img").explode(finalParams);
+        $img.explode(finalParams);
     }, 600);
 }
 function generateDemo() {
@@ -194,7 +194,7 @@ function generateEffectUrl() {
     effectUrl.value = result;
 }
 ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (sp, rsp, $timeout) {
-
+    $img = $("img");
     var timeout = void 0;
 
     function update(v, p) {

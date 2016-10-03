@@ -4,8 +4,11 @@
     $.fn.explodeRestore = function () {
         this.each(function () { //explode separately
             const $dom = $(this);
-            $dom.show();
-            $dom.siblings().filter(`.${wrapperName}`).remove();
+            const wrapper = $dom.prop(wrapperName);           
+            if (wrapper) {
+                wrapper.replaceWith($dom);
+                $dom.prop(wrapperName, null);
+            }
         });
     };
     $.fn.explode = function (opt) {
@@ -68,7 +71,7 @@
         if ($wrapper.css("position") === "static") {
             $wrapper.css("position", "relative");
         }
-        
+        $wrapper.css("flex","0");
         const startRatio = 0.3;
 
 
@@ -115,10 +118,10 @@
 
         });
 
-
-        
-        $target.hide();
         $target.after($wrapper);
+        $target.prop(wrapperName, $wrapper);
+        $target.detach();
+
         let biasVy = 0;
         explode(function () {
             if (release) {
@@ -390,9 +393,9 @@
                     generate(w - rowSum);
                 }
             }
-            rags.sort(function(rag1,rag2){
-                
-                return Math.random()>0.5?1:-1;
+            rags.sort(function (rag1, rag2) {
+
+                return Math.random() > 0.5 ? 1 : -1;
             })
 
             return rags;
