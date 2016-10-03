@@ -155,29 +155,32 @@ if (initValue) {
 //console.log(settings, params)
 //console.log(initValue)
 var $img = void 0;
+
+function getFinalParams() {
+    var finalParams = {};
+    params.forEach(function (v) {
+        var value = void 0;
+        if (v.type === "number") {
+            value = parseInt(v.value);
+        } else {
+            value = v.value;
+        }
+        finalParams[v.name] = value;
+    });
+    return finalParams;
+}
+
 function explode() {
     $img.explodeRestore();
     setTimeout(function () {
-        var finalParams = {};
-        params.forEach(function (v) {
-            var value = void 0;
-            if (v.type === "number") {
-                value = parseInt(v.value);
-            } else {
-                value = v.value;
-            }
-            finalParams[v.name] = value;
-        });
-        $img.explode(finalParams);
+        $img.explode(getFinalParams());
     }, 600);
 }
+
 function generateDemo() {
-    var paramsThis = {};
-    params.forEach(function (v) {
-        paramsThis[v.name] = v.value;
-    });
-    demo.value = "$(\"#target\").explode(" + JSON.stringify(paramsThis) + ");";
+    demo.value = "$(\"#target\").explode(" + JSON.stringify(getFinalParams()) + ");";
 }
+
 function generateEffectUrl() {
     var result = {
         settings: {},

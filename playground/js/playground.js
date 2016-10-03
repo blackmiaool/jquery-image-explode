@@ -1,4 +1,4 @@
-const baseAddr=`http://blackmiaool.com/jquery-image-explode/playground.html`;
+const baseAddr = `http://blackmiaool.com/jquery-image-explode/playground.html`;
 var ng = angular.module("app", []);
 
 function extend(dest, src) {
@@ -40,7 +40,7 @@ const effectUrl = {
 }
 const demo = {
     name: "demo",
-    type: "textarea",  
+    type: "textarea",
     title: "Copy to use",
 }
 const params = [
@@ -154,7 +154,7 @@ const params = [
 ];
 let initValue = location.href.split("?")[1];
 if (initValue) {
-//    console.log(initValue)
+    //    console.log(initValue)
     initValue = JSON.parse(decodeURIComponent(initValue));
     params.forEach(function (v, i) {
         if (!initValue.params.hasOwnProperty(v.name))
@@ -168,29 +168,32 @@ if (initValue) {
 //console.log(settings, params)
 //console.log(initValue)
 let $img;
+
+function getFinalParams() {
+    let finalParams = {};
+    params.forEach(function (v) {
+        let value;
+        if (v.type === "number") {
+            value = parseInt(v.value);
+        } else {
+            value = v.value;
+        }
+        finalParams[v.name] = value;
+    });
+    return finalParams;    
+}
+
 function explode() {
     $img.explodeRestore();
     setTimeout(function () {
-        let finalParams = {};
-        params.forEach(function (v) {
-            let value;
-            if (v.type === "number") {
-                value = parseInt(v.value);
-            } else {
-                value = v.value;
-            }
-            finalParams[v.name] = value;
-        });
-        $img.explode(finalParams);
+        $img.explode(getFinalParams());
     }, 600);
 }
+
 function generateDemo() {
-    const paramsThis={};
-    params.forEach(function(v){
-        paramsThis[v.name]=v.value;
-    });
-    demo.value=`$("#target").explode(${JSON.stringify(paramsThis)});`;
+    demo.value = `$("#target").explode(${JSON.stringify(getFinalParams())});`;
 }
+
 function generateEffectUrl() {
     let result = {
         settings: {},
@@ -207,7 +210,7 @@ function generateEffectUrl() {
     effectUrl.value = result;
 }
 ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (sp, rsp, $timeout) {
-    $img=$("img");
+    $img = $("img");
     let timeout;
 
     function update(v, p) {
