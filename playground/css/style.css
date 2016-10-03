@@ -102,12 +102,16 @@ img {
   outline: none !important;
 }
 #wrap {
+  margin-top: 10px;
   align-items: baseline;
   position: relative;
   margin: auto;
   max-width: 1000px;
   display: flex;
   flex-direction: row;
+}
+#wrap > * {
+  margin-top: 10px;
 }
 #wrap > .left {
   flex: 1;
