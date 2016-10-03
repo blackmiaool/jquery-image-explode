@@ -316,7 +316,7 @@
 
                 let ratio = ((1 - startRatio) * (1 - (v.width - minWidth) / (maxWidth - minWidth)) + startRatio) * Math.random();
                 ratio = 1 - (1 - ratio) * (1 - minRadius / radius);
-                console.log(ratio)
+
                 const finalDistance = (radius - distance) * ratio + distance;
                 const distanceSquare = distance * distance;
                 const translateX = (finalDistance - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1);
