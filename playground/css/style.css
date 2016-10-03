@@ -150,6 +150,7 @@ img {
 }
 #wrap > .left .mode .share {
   text-align: left;
+  margin-bottom: 10px;
 }
 #wrap > .left .mode textarea {
   word-break: break-all;

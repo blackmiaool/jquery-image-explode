@@ -1,4 +1,4 @@
-const baseAddr=`http://blackmiaool.com/jquery-image-explode/playground/playground.html`;
+const baseAddr=`http://blackmiaool.com/jquery-image-explode/playground.html`;
 var ng = angular.module("app", []);
 
 function extend(dest, src) {
@@ -18,8 +18,14 @@ const settings = {
     imageUrl: {
         type: "string",
         title: "You can use base64 image",
-        value: "../try-jquery.jpg",
-        initValue: "../try-jquery.jpg",
+        value: "./demo.jpg",
+        initValue: "./demo.jpg",
+    },
+    imageWidth: {
+        type: "number",
+        title: "The the width(px) of image above",
+        value: 0,
+        initValue: 300,
     },
 
 };
@@ -31,6 +37,11 @@ const effectUrl = {
     type: "textarea",
     title: "Share the effect",
     value: location.href,
+}
+const demo = {
+    name: "demo",
+    type: "textarea",  
+    title: "Copy to use",
 }
 const params = [
     {
@@ -173,7 +184,13 @@ function explode() {
         $("img").explode(finalParams);
     }, 600);
 }
-
+function generateDemo() {
+    const paramsThis={};
+    params.forEach(function(v){
+        paramsThis[v.name]=v.value;
+    });
+    demo.value=`$("#target").explode(${JSON.stringify(paramsThis)});`;
+}
 function generateEffectUrl() {
     let result = {
         settings: {},
@@ -198,6 +215,7 @@ ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (s
             return;
         }
         generateEffectUrl();
+        generateDemo();
         if (timeout) {
             clearTimeout(timeout);
         }
@@ -224,6 +242,7 @@ ng.controller("RootController", ["$scope", "$rootScope", "$timeout", function (s
         explode,
         params,
         settings,
-        effectUrl
+        effectUrl,
+        demo
     });
 }]);

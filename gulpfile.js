@@ -7,13 +7,23 @@ const uglify = require('gulp-uglify');
 const rename = require("gulp-rename");
 const livereload = require('gulp-livereload');
 const less = require('gulp-less');
-function get_babel_params() {
-    return {
-        presets: ['es2015'],
-    }
-}
+const pkg = require('./package.json');
+const banner = require('gulp-banner');
+
+
+var comment = '/*\n' +
+    ' * <%= pkg.name %> <%= pkg.version %>\n' +
+    ' * <%= pkg.description %>\n' +
+    ' * <%= pkg.homepage %>\n' +
+    ' *\n' +
+    ' * Copyright 2015, <%= pkg.author %>\n' +
+    ' * Released under the <%= pkg.license %> license.\n' +
+    '*/\n\n';
 gulp.task('js', function () {
-    let babel_pipe = babel(get_babel_params());
+    let babel_pipe = babel({
+        presets: ['es2015'],
+        minified: true,
+    });
     babel_pipe.on('error', function (e) {
         gutil.log(e);
         babel_pipe.end();
@@ -21,10 +31,13 @@ gulp.task('js', function () {
 
     return gulp.src(['jquery.imgexplode.js'])
         .pipe(babel_pipe)
-        .pipe(uglify())
         .pipe(rename(function (path) {
             path.basename += ".min";
         }))
+        .pipe(uglify())
+        .pipe(banner(comment, {
+            pkg
+        }))        
         .pipe(gulp.dest('dist'))
         .pipe(livereload())
 });
@@ -41,7 +54,9 @@ gulp.task('playground-less', function () {
         .pipe(livereload())
 });
 gulp.task('playground-js', function () {
-    let babel_pipe = babel(get_babel_params());
+    let babel_pipe = babel({
+        presets: ['es2015'],
+    });
     babel_pipe.on('error', function (e) {
         gutil.log(e);
         babel_pipe.end();
@@ -53,10 +68,10 @@ gulp.task('playground-js', function () {
         .pipe(livereload())
 });
 gulp.task('playground', function () {
-    return gulp.start(["js","playground-js","playground-less"]);
+    return gulp.start(["js", "playground-js", "playground-less"]);
 });
 gulp.task('default', function () {
-    return gulp.start(["js",'playground'])
+    return gulp.start(["js", 'playground'])
 });
 gulp.task('reload', function () {
     gulp.src("")
@@ -67,6 +82,4 @@ gulp.watch('./*.js', ['js']);
 gulp.watch('index.html', ['reload']);
 gulp.watch('playground/js/*', ['playground-js']);
 gulp.watch('playground/less/*', ['playground-less']);
-gulp.watch('playground/*.html', ['reload']);
-
-
+gulp.watch('playground.html', ['reload']);

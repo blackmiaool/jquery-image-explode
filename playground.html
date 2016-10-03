@@ -7,14 +7,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="format-detection" content="telephone=no">
     <title>爆炸测试</title>
-    <link rel="stylesheet" href="./css/bootstrap.min.css">
-    <link rel="stylesheet" href="./css/bootstrap-theme.min.css">
-    <link rel="stylesheet" href="./css/style.css">
-    <script src="../lib/jquery-3.1.0.js"></script>
-    <script src="../jquery.imgexplode.js"></script>
+    <link rel="stylesheet" href="./playground/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./playground/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="./playground/css/style.css">
+    <script src="lib/jquery-3.1.0.js"></script>
+    <script src="jquery.imgexplode.js"></script>
     <!--    <script src="dist/jquery.imgexplode.min.js"></script>-->
-    <script src="../lib/angular.min.js"></script>
-    <script src="dist/playground.js"></script>
+    <script src="lib/angular.min.js"></script>
+    <script src="playground/dist/playground.js"></script>
 </head>
 
 <body style="margin:0;text-align:center;" ng-app="app" ng-controller="RootController">
@@ -26,7 +26,7 @@
             <div class="preview-wrap">
                 <div class="preview"  ng-click="explode()">
 
-                    <img ng-src="{{settings.imageUrl.value}}" />
+                    <img ng-style="{width:settings.imageWidth.value}" ng-src="{{settings.imageUrl.value}}" />
                 </div>
             </div>
 
@@ -68,6 +68,14 @@
                     <main>
                         <div class="input-wrap">
                             <textarea class="form-control" ng-model="effectUrl.value" type="text"></textarea>
+                        </div>
+                    </main>
+                </div>
+                <div class="Demo">
+                    <header><span class="name" ng-bind="demo.name"></span>(<span class="descr" ng-bind="demo.title"></span>)</header>
+                    <main>
+                        <div class="input-wrap">
+                            <textarea class="form-control" ng-model="demo.value" type="text"></textarea>
                         </div>
                     </main>
                 </div>
