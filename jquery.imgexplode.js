@@ -1,13 +1,13 @@
 (function ($) {
     "use strict";
-    var wrapperName = "explode-wrapper";
+    const wrapperName = "explode-wrapper";
     $.fn.explodeRestore = function () {
         this.each(function () { //explode separately
             const $dom = $(this);
             $dom.show();
             $dom.siblings().filter(`.${wrapperName}`).remove();
         });
-    }
+    };
     $.fn.explode = function (opt) {
         if (!opt || typeof opt !== "object") {
             opt = {};
@@ -51,19 +51,7 @@
         const w = $target.width();
         const h = $target.height();
         const minorDimension = Math.min(w, h);
-        let background;
 
-        if ($target.prop("tagName") === "IMG") {
-            background = {
-                kind: "image",
-                src: $target.attr("src"),
-            };
-        } else {
-            background = {
-                kind: "color",
-                color: $target.css("background-color"),
-            };
-        }
         const ctxWidth = Math.max(w, radius * 2);
         const ctxHeight = Math.max(h, radius * 2, groundDistance * 2);
         if (!maxWidth) {
@@ -80,7 +68,7 @@
         if ($wrapper.css("position") === "static") {
             $wrapper.css("position", "relative");
         }
-        const targetDisplay = $target.css("display");
+        
         const startRatio = 0.3;
 
 
@@ -110,11 +98,11 @@
         $canvas.attr({
             width: ctxWidth,
             height: ctxHeight,
-        })
+        });
         $wrapper.append($canvas);
         const scaleX = w / naturalWidth;
         const scaleY = h / naturalHeight;
-        rags.forEach((rag, i) => {
+        rags.forEach((rag) => {
             const {
                 left,
                 top,
@@ -128,7 +116,7 @@
         });
 
 
-        let remainCnt = rags.length;
+        
         $target.hide();
         $target.after($wrapper);
         let biasVy = 0;
@@ -154,7 +142,7 @@
                 const time = Date.now();
                 const duration = time - startTime;
 
-                ctx.clearRect(0, 0, ctxWidth, ctxHeight)
+                ctx.clearRect(0, 0, ctxWidth, ctxHeight);
 
                 rags.forEach((rag) => {
                     ctx.save();
@@ -207,17 +195,6 @@
         }
 
 
-        function setContent($dom) {
-            switch (background.kind) {
-            case "image":
-                $dom.css("background-image", `url("${background.src}")`);
-                break;
-            case "color":
-                $dom.css("background-color", `${background.color}`);
-                break;
-            default:
-            }
-        }
 
         function explode(cb, reverse) {
             const startTime = Date.now();
@@ -225,7 +202,7 @@
             let leftCnt = rags.length;
 
             if (!reverse) {
-                rags.forEach((rag, i) => {
+                rags.forEach((rag) => {
                     rag.vx = rag.translateX / explodeTime * 1000;
                     rag.vy = rag.translateY / explodeTime * 1000;
 
@@ -259,7 +236,7 @@
                     ratio = -ratio;
                 }
                 lastTime = time;
-                ctx.clearRect(0, 0, ctxWidth, ctxHeight)
+                ctx.clearRect(0, 0, ctxWidth, ctxHeight);
                 rags.forEach((rag) => {
                     ctx.save();
                     const {
@@ -356,11 +333,11 @@
                     finalAngle,
                 };
 
-                for (var i in attach) {
+                for (let i in attach) {
                     v[i] = attach[i];
                 }
 
-            })
+            });
         }
         //generate inital position and dimension of rags
         //rewrite it to fit for you demand
