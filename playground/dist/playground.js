@@ -138,7 +138,7 @@ var params = [{
     min: 0,
     max: 235,
     value: 0,
-    initValue: 235
+    initValue: 236
 }];
 var initValue = location.href.split("?")[1];
 if (initValue) {
