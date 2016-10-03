@@ -65,11 +65,23 @@ var params = [{
     value: false,
     initValue: false
 }, {
+    name: "fadeTime",
+    type: "number",
+    title: "The time relasing rag fade",
+    value: 0,
+    initValue: 300
+}, {
     name: "recycle",
     type: "boolean",
     title: "If recycle rags after explosion",
     value: false,
     initValue: false
+}, {
+    name: "recycleDelay",
+    type: "number",
+    title: "The time between explosion and recycle",
+    value: 0,
+    initValue: 500
 }, {
     name: "explodeTime",
     type: "number",

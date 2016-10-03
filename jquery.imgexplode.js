@@ -19,7 +19,9 @@
                 radius = 80,
                 minRadius = 20,
                 release = true,
+                fadeTime = 300,
                 recycle = true,
+                recycleDelay = 500,
                 fill = true,
                 explodeTime = 300,
                 maxAngle = 360,
@@ -130,7 +132,7 @@
         $target.hide();
         $target.after($wrapper);
         let biasVy = 0;
-        explodeCanvas(function () {
+        explode(function () {
             if (release) {
                 doRelease();
             } else if (recycle) {
@@ -141,9 +143,9 @@
         function doRelease(cb) {
             const startTime = Date.now();
             let leftCnt = rags.length;
-            let fadeTime = 300;
+
             rags.forEach((rag) => {
-                rag.time1 = 1000 / (rag.ratio*(maxWidth+1-rag.width)/maxWidth + 0.1);
+                rag.time1 = 1000 / (rag.ratio * (maxWidth + 1 - rag.width) / maxWidth + 0.1);
                 rag.time2 = rag.time1 + fadeTime;
             });
             draw();
@@ -179,8 +181,8 @@
                     } else {
                         alpha = 1 - (duration - rag.time1) / fadeTime;
                     }
-                    if(alpha===0&&!rag.released){
-                        rag.released=true;
+                    if (alpha === 0 && !rag.released) {
+                        rag.released = true;
                         leftCnt--;
                     }
                     ctx.globalAlpha = alpha;
@@ -188,104 +190,21 @@
                     ctx.restore();
                 });
                 if (!leftCnt) {
-                    cb&&cb();
+                    cb && cb();
                 } else {
                     window.requestAnimationFrame(draw);
                 }
-
-
             }
         }
 
         function doRecycle() {
+            setTimeout(function () {
+                explode(function () {
+                    $target.explodeRestore();
+                }, true);
+            }, recycleDelay);
 
         }
-
-        function afterExplode(cb) {
-            const startTime = Date.now();
-            let lastTime = startTime;
-            let leftCnt = rags.length;
-            biasVy = -biasVy;
-            rags.forEach((rag, i) => {
-                rag.vx = -rag.vx;
-                rag.vy = -rag.vy;
-                rag.land = false;
-                rag.transYMax = ctxHeight / 2 + groundDistance - rag.height / 2;
-            });
-            draw();
-
-
-            function draw() {
-                const time = Date.now();
-                let ratio;
-                let angleRatio;
-                ratio = (time - lastTime) / 1000;
-                angleRatio = (time - startTime) / explodeTime;
-                if (gravity) {
-                    biasVy += (gravity * ratio) * 300;
-                } else {
-                    if (angleRatio > 1) {
-                        cb && cb();
-                        return;
-                    }
-                    ratio *= Math.cos(angleRatio * Math.PI / 2) * Math.PI / 2;
-                }
-                lastTime = time;
-                ctx.clearRect(0, 0, ctxWidth, ctxHeight)
-
-                rags.forEach((rag) => {
-                    ctx.save();
-                    const {
-                        left,
-                        top,
-                        width: ragWidth,
-                        height: ragHeight,
-                    } = rag;
-
-                    if (recycle) {
-                        rag.biasx += rag.vx * ratio;
-                        rag.biasy += (rag.vy + biasVy) * ratio;
-
-                        if (gravity) {
-                            if (rag.biasy > rag.transYMax) {
-                                leftCnt--;
-                                rag.land = true;
-                                rag.lastAngle = rag.finalAngleRad * angleRatio;
-                                rag.biasy = rag.transYMax;
-                            }
-                        }
-                    }
-
-                    ctx.translate(rag.biasx, rag.biasy);
-
-                    if (rag.lastAngle) {
-                        ctx.rotate(rag.lastAngle);
-                    } else {
-                        ctx.rotate(rag.finalAngleRad * angleRatio);
-                    }
-
-                    if (round) {
-                        ctx.beginPath();
-                        ctx.arc(0, 0, ragWidth / 2, 0, Math.PI * 2, false);
-                        ctx.closePath();
-                        ctx.clip();
-                    }
-                    ctx.globalAlpha = 0.5;
-                    ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
-                    ctx.restore();
-                });
-                if (gravity && !leftCnt) {
-                    cb();
-                } else {
-                    window.requestAnimationFrame(draw);
-                }
-
-
-            }
-
-        }
-
-
 
 
         function setContent($dom) {
@@ -300,19 +219,22 @@
             }
         }
 
-        function explodeCanvas(cb) {
+        function explode(cb, reverse) {
             const startTime = Date.now();
             let lastTime = startTime;
             let leftCnt = rags.length;
 
-            rags.forEach((rag, i) => {
-                rag.vx = rag.translateX / explodeTime * 1000;
-                rag.vy = rag.translateY / explodeTime * 1000;
+            if (!reverse) {
+                rags.forEach((rag, i) => {
+                    rag.vx = rag.translateX / explodeTime * 1000;
+                    rag.vy = rag.translateY / explodeTime * 1000;
 
-                rag.biasx = rag.translateX0;
-                rag.biasy = rag.translateY0;
-                rag.transYMax = ctxHeight / 2 + groundDistance - rag.height / 2;
-            })
+                    rag.biasx = rag.translateX0;
+                    rag.biasy = rag.translateY0;
+                    rag.transYMax = ctxHeight / 2 + groundDistance - rag.height / 2;
+                });
+            }
+
             draw();
 
             function draw() {
@@ -321,14 +243,20 @@
                 let angleRatio;
                 ratio = (time - lastTime) / 1000;
                 angleRatio = (time - startTime) / explodeTime;
+                if (reverse) {
+                    angleRatio = 1 - angleRatio;
+                }
                 if (gravity) {
                     biasVy += (gravity * ratio) * 300;
                 } else {
-                    if (angleRatio > 1) {
+                    if (angleRatio > 1 || angleRatio < 0) {
                         cb && cb();
                         return;
                     }
                     ratio *= Math.cos(angleRatio * Math.PI / 2) * Math.PI / 2;
+                }
+                if (reverse) {
+                    ratio = -ratio;
                 }
                 lastTime = time;
                 ctx.clearRect(0, 0, ctxWidth, ctxHeight)
