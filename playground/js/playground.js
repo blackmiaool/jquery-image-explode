@@ -65,11 +65,20 @@ const params = [
     {
         name: "radius",
         type: "number",
-        title: "Explode radius(px)",
+        title: "Explosion radius(px)",
         min: 50,
         max: 300,
         value: 0,
         initValue: 235,
+    },
+    {
+        name: "minRadius",
+        type: "number",
+        title: "The minimum explosion radius(px)",
+        min: 0,
+        max: 300,
+        value: 0,
+        initValue: 15,
     },
     {
         name: "release",
