@@ -397,7 +397,7 @@
             rags.sort(function (rag1, rag2) {
 
                 return Math.random() > 0.5 ? 1 : -1;
-            })
+            });
 
             return rags;
         }

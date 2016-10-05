@@ -17,10 +17,11 @@
 <!--    <script src="dist/jquery.imgexplode.min.js"></script>-->
     <script src="dist/jquery.imgexplode.min.js"></script>
     <script>
+        var $img=$("img");
         function explode() {
-            $("img").explodeRestore();
+            $img.explodeRestore();
             setTimeout(function () {                
-                $("img").explode({
+                $img.explode({
                     maxWidth: 12,
                     minWidth: 3,
                     radius: 231,                    
