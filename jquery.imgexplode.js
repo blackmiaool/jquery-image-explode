@@ -39,21 +39,29 @@
 
         const $target = this;
         const args = arguments;
-        $target.each(function () { //explode separately
-            const $dom = $(this);
-            if ($dom.prop("tagName") === "IMG") {
-                if (!$dom.prop("complete")) {
+        if ($target.length > 1) { //explode separately
+            $target.each(function () {
+                const $dom = $(this);
+                $dom.explode.apply($dom, args);
+            });
+            return;
+        }
 
-                    $dom.on("load", function () {
-                        $dom.explode.apply($dom, args);
-                    });
-                }
+        if ($target.prop("tagName") === "IMG") {
+            if (!$target.prop("complete")) {
+
+                $target.on("load", function () {
+                    $target.explode.apply($target, args);
+                });
+                return;
             }
-        });
+        }
+
 
         const w = $target.width();
         const h = $target.height();
         const minorDimension = Math.min(w, h);
+        const radiusData = getRadiusData();
 
         const ctxWidth = Math.max(w, radius * 2);
         const ctxHeight = Math.max(h, radius * 2, groundDistance * 2);
@@ -90,8 +98,8 @@
         $canvas = $("<canvas></canvas>");
         $canvas.css({
             position: "absolute",
-            left: (w-ctxWidth) / 2,
-            right: (w-ctxWidth) / 2,
+            left: (w - ctxWidth) / 2,
+            right: (w - ctxWidth) / 2,
             top: (h - ctxHeight) / 2,
             bottom: (h - ctxHeight) / 2,
             margin: "auto",
@@ -347,6 +355,7 @@
         //rewrite it to fit for you demand
         function generateRags() {
             let rowCnt;
+            const base = [[0, 1], [1, 1], [1, 0], [0, 0]];
             if (omitLastLine) {
                 rowCnt = Math.floor(h / maxWidth);
             } else {
@@ -359,6 +368,41 @@
                 generateRow(row);
             }
 
+            function isInner(x, y) {
+                if (x < radiusData[0] && y > h - radiusData[0] ||
+                    x > w - radiusData[1] && y > h - radiusData[1] ||
+                    x > w - radiusData[2] && y < radiusData[2] ||
+                    x < radiusData[3] && y < radiusData[3]) {
+                    return false;
+                }
+                return true;
+            }
+
+            function distanceLessThan(x1, y1, x2, y2, d) {
+                return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) < d * d;
+            }
+
+            function tryPushRag({
+                left,
+                top,
+                width,
+                height
+            }) {
+                const x = left;
+                const y = h - top;
+
+                if (isInner(x, y) || radiusData.some(function (v, i) {
+                        return distanceLessThan(x, y, base[i][0] * w + 2 * (0.5 - base[i][0]) * v, base[i][1] * h + 2 * (0.5 - base[i][1]) * v, v);
+                    })) {
+                    rags.push({
+                        left,
+                        top,
+                        width,
+                        height
+                    });
+                }
+            }
+
             function generateRow(row) {
                 let rowSum = 0;
                 const topBase = row * maxWidth;
@@ -366,7 +410,7 @@
                 function generate(width) {
                     const left = rowSum;
                     rowSum += width;
-                    rags.push({
+                    tryPushRag({
                         left,
                         top: topBase,
                         width,
@@ -374,7 +418,7 @@
                     });
                     if (fill) {
                         for (let i = 1; i < parseInt(maxWidth / width); i++) {
-                            rags.push({
+                            tryPushRag({
                                 left,
                                 top: topBase + i * width,
                                 width,
@@ -400,6 +444,21 @@
             });
 
             return rags;
+        }
+        //get an array of 4 corners of radius        
+        function getRadiusData() {
+            let ret = ["border-top-left-radius", "border-top-right-radius", "border-bottom-right-radius", "border-bottom-left-radius"];
+            const width = $target.width();
+            ret = ret.map(function (key) {
+                let radius = $target.css(key);
+                if (radius.match(/px$/)) {
+                    return radius.match(/^\d+/)[0] * 1;
+                } else if (radius.match(/%$/)) {
+                    return radius.match(/^\d+/)[0] / 100 * width;
+                }
+                return radius;
+            });
+            return ret;
         }
     };
 })(window.jQuery);
