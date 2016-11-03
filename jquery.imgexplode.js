@@ -55,6 +55,8 @@
                 });
                 return;
             }
+        } else {
+
         }
 
 
@@ -82,20 +84,14 @@
 
         const startRatio = 0.3;
 
-
+        //generate rags' body
         const rags = generateRags();
         getRagsFinalState();
 
-        let $canvas;
-        let ctx;
-        const {
-            naturalWidth,
-            naturalHeight
-        } = $target[0];
-        //generate rags' body
-
-
-        $canvas = $("<canvas></canvas>");
+        const $canvas = $("<canvas></canvas>");
+        
+        //standard canvas, to draw the ideal target
+        const $canvas0 = $("<canvas></canvas>");
         $canvas.css({
             position: "absolute",
             left: (w - ctxWidth) / 2,
@@ -106,13 +102,32 @@
             width: ctxWidth,
             height: ctxHeight,
         });
+        $canvas0.css({
+            width: w,
+            height: h,
+        });
+        $canvas0.attr({
+            width: w,
+            height: h,
+        });
         $canvas.attr({
             width: ctxWidth,
             height: ctxHeight,
         });
+
         $wrapper.append($canvas);
-        const scaleX = w / naturalWidth;
-        const scaleY = h / naturalHeight;
+
+        const ctx = $canvas[0].getContext("2d");
+        const ctx0 = $canvas0[0].getContext("2d");
+        
+        const {
+            naturalWidth,
+            naturalHeight
+        } = $target[0];
+        ctx0.drawImage($target[0],0,0,naturalWidth,naturalHeight,0,0, w, h);
+        
+        const scaleX = 1;
+        const scaleY = 1;
         rags.forEach((rag) => {
             const {
                 left,
@@ -121,8 +136,8 @@
                 height: ragHeight,
             } = rag;
 
-            ctx = $canvas[0].getContext("2d");
-            rag.naturalParams = [left / scaleX, top / scaleY, ragWidth / scaleX, ragHeight / scaleY];
+
+            rag.naturalParams = [left, top, ragWidth, ragHeight];
 
         });
 
@@ -185,7 +200,7 @@
                         leftCnt--;
                     }
                     ctx.globalAlpha = alpha;
-                    ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+                    ctx.drawImage($canvas0[0], rag.left, rag.top, rag.width, rag.height, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
                     ctx.restore();
                 });
                 if (!leftCnt) {
@@ -284,7 +299,7 @@
                         ctx.clip();
                     }
 
-                    ctx.drawImage($target[0], ...rag.naturalParams, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+                    ctx.drawImage($canvas0[0],rag.left, rag.top, rag.width, rag.height, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
                     ctx.restore();
                 });
                 if (gravity && !leftCnt) {
@@ -292,10 +307,7 @@
                 } else {
                     window.requestAnimationFrame(draw);
                 }
-
-
             }
-
         }
 
         function random(min, max) {
@@ -306,7 +318,6 @@
         function getRagsFinalState() {
             rags.forEach((v, i) => {
                 const finalAngle = (((Math.random() * maxAngle * 2) - maxAngle) / ((Math.random() + 2) * v.width)) * 10;
-                const finalAngleRad = finalAngle * (Math.PI / 180);
 
                 //coordinate based on center point
                 let x = v.left + v.width / 2 - w / 2;
@@ -327,22 +338,19 @@
 
                 const finalDistance = (radius - distance) * ratio + distance;
                 const distanceSquare = distance * distance;
-                const translateX = (finalDistance - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1);
-                const translateY = (finalDistance - distance) * Math.sqrt((distanceSquare - x * x) / (distanceSquare)) * (y > 0 ? 1 : -1);
-                const translateX0 = (ctxWidth - w) / 2 + v.left + v.width / 2;
-                const translateY0 = (ctxHeight - h) / 2 + v.top + v.height / 2;
+
                 const attach = {
                     finalDistance,
                     ratio,
                     x,
                     y,
                     distance,
-                    translateX,
-                    translateY,
-                    translateX0,
-                    translateY0,
-                    finalAngleRad,
+                    translateX: (finalDistance - distance) * Math.sqrt((distanceSquare - y * y) / (distanceSquare)) * (x > 0 ? 1 : -1),
+                    translateY: (finalDistance - distance) * Math.sqrt((distanceSquare - x * x) / (distanceSquare)) * (y > 0 ? 1 : -1),
+                    translateX0: (ctxWidth - w) / 2 + v.left + v.width / 2,
+                    translateY0: (ctxHeight - h) / 2 + v.top + v.height / 2,
                     finalAngle,
+                    finalAngleRad: finalAngle * (Math.PI / 180),
                 };
 
                 for (let i in attach) {
@@ -381,6 +389,9 @@
             function distanceLessThan(x1, y1, x2, y2, d) {
                 return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) < d * d;
             }
+            const noRadius = radiusData.every(function (v) {
+                return v === 0
+            });
 
             function tryPushRag({
                 left,
@@ -391,7 +402,7 @@
                 const x = left;
                 const y = h - top;
 
-                if (isInner(x, y) || radiusData.some(function (v, i) {
+                if (noRadius || isInner(x, y) || radiusData.some(function (v, i) {
                         return distanceLessThan(x, y, base[i][0] * w + 2 * (0.5 - base[i][0]) * v, base[i][1] * h + 2 * (0.5 - base[i][1]) * v, v);
                     })) {
                     rags.push({
