@@ -89,7 +89,7 @@
         getRagsFinalState();
 
         const $canvas = $("<canvas></canvas>");
-        
+
         //standard canvas, to draw the ideal target
         const $canvas0 = $("<canvas></canvas>");
         $canvas.css({
@@ -119,13 +119,23 @@
 
         const ctx = $canvas[0].getContext("2d");
         const ctx0 = $canvas0[0].getContext("2d");
-        
+
         const {
             naturalWidth,
             naturalHeight
         } = $target[0];
-        ctx0.drawImage($target[0],0,0,naturalWidth,naturalHeight,0,0, w, h);
-        
+        if ($target.prop("tagName") === "IMG") {
+            ctx0.drawImage($target[0], 0, 0, naturalWidth, naturalHeight, 0, 0, w, h);
+        } else if ($target.css("backgroundImage") !== "none") {
+
+        } else if ($target.css("backgroundColor") !== "rgba(0, 0, 0, 0)") {
+            ctx0.fillStyle = $target.css("backgroundColor");
+            ctx0.fillRect(0, 0, w, h);
+        } else {
+            console.warn("There's nothing to explode.");
+        }
+
+
         const scaleX = 1;
         const scaleY = 1;
         rags.forEach((rag) => {
@@ -299,7 +309,7 @@
                         ctx.clip();
                     }
 
-                    ctx.drawImage($canvas0[0],rag.left, rag.top, rag.width, rag.height, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
+                    ctx.drawImage($canvas0[0], rag.left, rag.top, rag.width, rag.height, -ragWidth / 2, -ragHeight / 2, ragWidth, ragHeight);
                     ctx.restore();
                 });
                 if (gravity && !leftCnt) {
@@ -399,8 +409,8 @@
                 width,
                 height
             }) {
-                const x = left;
-                const y = h - top;
+                const x = left + width / 2;
+                const y = h - top - height / 2;
 
                 if (noRadius || isInner(x, y) || radiusData.some(function (v, i) {
                         return distanceLessThan(x, y, base[i][0] * w + 2 * (0.5 - base[i][0]) * v, base[i][1] * h + 2 * (0.5 - base[i][1]) * v, v);
@@ -466,6 +476,12 @@
                     return radius.match(/^\d+/)[0] * 1;
                 } else if (radius.match(/%$/)) {
                     return radius.match(/^\d+/)[0] / 100 * width;
+                }
+                return radius;
+            });
+            ret = ret.map(function (radius) {
+                if (radius > width / 2) {
+                    radius = width / 2
                 }
                 return radius;
             });
