@@ -7,32 +7,55 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="format-detection" content="telephone=no">
     <title>Explosion Demo</title>
+    <style>
+        #target {
+            display: block;
+            margin: auto;
+            margin-top: 100px;
+            margin-bottom: 10px;
+            width: 277px;
+            border-radius: 50px;
+        }
+        
+        #github {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 138px;
+            height: 138px;
+            display: block;
+            background: transparent url(./fork.png) 0 0 no-repeat;
+            text-indent: -9000px;
+            z-index: 3;
+        }
+    </style>
 </head>
 
 <body style="margin:0;text-align:center;">
-   <a target="_blank" href="https://github.com/blackmiaool/jquery-image-explode" style="position: absolute;top: 0;left: 0;width: 138px;height: 138px;display: block;background: transparent url(./fork.png) 0 0 no-repeat;text-indent: -9000px;z-index: 3;"></a>
-    <img src="./demo.jpg" style="display:inline-block;margin-top:100px;margin-bottom:10px;width:277px;border-radius:50px;" />
+    <a id="github" target="_blank" href="https://github.com/blackmiaool/jquery-image-explode"></a>
+    <img id="target" src="./demo.jpg" />
     <button style="position:fixed;right:0;top:0;width:100px;height:50px;" onclick="explode()">Explode</button>
     <script src="lib/jquery-3.1.0.js"></script>
-<!--    <script src="dist/jquery.imgexplode.min.js"></script>-->
+    <!--    <script src="jquery.imgexplode.js"></script>-->
     <script src="dist/jquery.imgexplode.min.js"></script>
     <script>
-        var $img=$("img");
+        var $target = $("#target");
+
         function explode() {
-            $img.explodeRestore();
-            setTimeout(function () {                
-                $img.explode({
+            $target.explodeRestore();
+            setTimeout(function () {
+                $target.explode({
                     maxWidth: 15,
                     minWidth: 5,
-                    radius: 231,                    
+                    radius: 231,
                     release: false,
                     recycle: false,
                     explodeTime: 320,
                     canvas: true,
-                    round:false,
+                    round: false,
                     maxAngle: 360,
-                    gravity:10,
-                    groundDistance:150,
+                    gravity: 10,
+                    groundDistance: 150,
                 });
             }, 300)
         }

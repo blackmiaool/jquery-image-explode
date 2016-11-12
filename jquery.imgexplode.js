@@ -31,6 +31,7 @@
                 gravity = 0,
                 round = false,
                 groundDistance = 400,
+                ignoreCompelete = false,
         } = opt;
 
         let {
@@ -38,12 +39,15 @@
         } = opt;
 
         const $target = this;
+        let $targetImage;
         const args = arguments;
         if ($target.length > 1) { //explode separately
             $target.each(function () {
                 const $dom = $(this);
                 $dom.explode.apply($dom, args);
             });
+            return;
+        } else if (!$target.length) {
             return;
         }
 
@@ -55,10 +59,21 @@
                 });
                 return;
             }
-        } else {
+            $targetImage = $target;
+        } else if ($target.css("backgroundImage") !== "none") {
 
+            const src = $target.css("backgroundImage").match(/url\(\"([\S\s]*)\"\)/)[1];
+            $targetImage = $("<img/>", {
+                src
+            });
+            if (opt.ignoreCompelete) {
+                $targetImage.on("load", function () {                    
+                    opt.ignoreCompelete = true;
+                    $target.explode.apply($target, [opt]);
+                });
+                return;
+            } 
         }
-
 
         const w = $target.width();
         const h = $target.height();
@@ -92,6 +107,15 @@
 
         //standard canvas, to draw the ideal target
         const $canvas0 = $("<canvas></canvas>");
+        $canvas0.css({
+            width: w,
+            height: h,
+        });
+        $canvas0.attr({
+            width: w,
+            height: h,
+        });
+
         $canvas.css({
             position: "absolute",
             left: (w - ctxWidth) / 2,
@@ -101,14 +125,6 @@
             margin: "auto",
             width: ctxWidth,
             height: ctxHeight,
-        });
-        $canvas0.css({
-            width: w,
-            height: h,
-        });
-        $canvas0.attr({
-            width: w,
-            height: h,
         });
         $canvas.attr({
             width: ctxWidth,
@@ -123,10 +139,56 @@
         const {
             naturalWidth,
             naturalHeight
-        } = $target[0];
+        } = $targetImage[0];
         if ($target.prop("tagName") === "IMG") {
-            ctx0.drawImage($target[0], 0, 0, naturalWidth, naturalHeight, 0, 0, w, h);
+            ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, 0, 0, w, h);
         } else if ($target.css("backgroundImage") !== "none") {
+            let dx = 0,
+                dy = 0,
+                dWidth = naturalWidth,
+                dHeight = naturalHeight;
+            let config = {
+                'background-repeat': $target.css("background-repeat"),
+                "background-size": $target.css("background-size"),
+                'background-position-x':$target.css("background-position-x"),
+                'background-position-y':$target.css("background-position-y"),
+            }
+   
+            function warn(key) {
+                console.warn(`Unsupported ${key} style:${config[key]}`);
+            }
+            const ratioW = w / naturalWidth;
+            const ratioH = h / naturalHeight;                       
+            
+            
+            if (config["background-size"] === "cover") {
+                const ratio = Math.max(ratioW, ratioH);
+             
+                dWidth = naturalWidth * ratio;
+                dHeight = naturalHeight * ratio;
+            } else if (config["background-size"] === "contain") {
+                const ratio = Math.min(ratioW, ratioH);
+             
+                dWidth = naturalWidth * ratio;
+                dHeight = naturalHeight * ratio;
+            } else {
+                warn("background-size");
+
+            }
+            dx=parseInt(config['background-position-x'])/100*(w-dWidth);
+            dy=parseInt(config['background-position-y'])/100*(h-dHeight);
+       
+            if (config["background-repeat"] === "repeat") {
+                for (var i = 0-Math.ceil(dx/dWidth); i < w / dWidth+Math.ceil(-dx/dWidth); i++) {
+                    for (var j = 0-Math.ceil(dy/dHeight); j < h / dHeight+Math.ceil(-dy/dHeight); j++) {
+                        ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, dx+i * dWidth, dy+j * dHeight, dWidth, dHeight);
+                    }
+                }
+            } else if (config["background-repeat"] === 'no-repeat') {
+                ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, dx, dy, dWidth, dHeight);
+            } else {
+                warn("background-repeat");
+            }
 
         } else if ($target.css("backgroundColor") !== "rgba(0, 0, 0, 0)") {
             ctx0.fillStyle = $target.css("backgroundColor");
@@ -153,7 +215,7 @@
 
         $target.after($wrapper);
         $target.prop(wrapperName, $wrapper);
-        $target.detach();
+        $target.detach();        
 
         let biasVy = 0;
         explode(function () {
@@ -381,11 +443,11 @@
             }
 
             const rags = [];
-            
+
             const noRadius = radiusData.every(function (v) {
                 return v === 0
             });
-            
+
             for (let row = 0; row < rowCnt; row++) {
                 generateRow(row);
             }
@@ -403,7 +465,7 @@
             function distanceLessThan(x1, y1, x2, y2, d) {
                 return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) < d * d;
             }
-            
+
 
             function tryPushRag({
                 left,
