@@ -381,7 +381,11 @@
             }
 
             const rags = [];
-
+            
+            const noRadius = radiusData.every(function (v) {
+                return v === 0
+            });
+            
             for (let row = 0; row < rowCnt; row++) {
                 generateRow(row);
             }
@@ -399,9 +403,7 @@
             function distanceLessThan(x1, y1, x2, y2, d) {
                 return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) < d * d;
             }
-            const noRadius = radiusData.every(function (v) {
-                return v === 0
-            });
+            
 
             function tryPushRag({
                 left,
