@@ -66,7 +66,7 @@
             $targetImage = $("<img/>", {
                 src
             });
-            if (opt.ignoreCompelete) {
+            if (!opt.ignoreCompelete) {
                 $targetImage.on("load", function () {                    
                     opt.ignoreCompelete = true;
                     $target.explode.apply($target, [opt]);
