@@ -1,6 +1,10 @@
 (function ($) {
     "use strict";
     const wrapperName = "explode-wrapper";
+    if(!$){
+        console.error("jQuery is needed.");
+        return;
+    }
     $.fn.explodeRestore = function () {
         this.each(function () { //explode separately
             const $dom = $(this);
@@ -32,6 +36,9 @@
                 round = false,
                 groundDistance = 400,
                 ignoreCompelete = false,
+                land=true,
+                checkOutBound,
+                finish,
         } = opt;
 
         let {
@@ -67,12 +74,12 @@
                 src
             });
             if (!opt.ignoreCompelete) {
-                $targetImage.on("load", function () {                    
+                $targetImage.on("load", function () {
                     opt.ignoreCompelete = true;
                     $target.explode.apply($target, [opt]);
                 });
                 return;
-            } 
+            }
         }
 
         const w = $target.width();
@@ -150,38 +157,38 @@
             let config = {
                 'background-repeat': $target.css("background-repeat"),
                 "background-size": $target.css("background-size"),
-                'background-position-x':$target.css("background-position-x"),
-                'background-position-y':$target.css("background-position-y"),
+                'background-position-x': $target.css("background-position-x"),
+                'background-position-y': $target.css("background-position-y"),
             }
-   
+
             function warn(key) {
                 console.warn(`Unsupported ${key} style:${config[key]}`);
             }
             const ratioW = w / naturalWidth;
-            const ratioH = h / naturalHeight;                       
-            
-            
+            const ratioH = h / naturalHeight;
+
+
             if (config["background-size"] === "cover") {
                 const ratio = Math.max(ratioW, ratioH);
-             
+
                 dWidth = naturalWidth * ratio;
                 dHeight = naturalHeight * ratio;
             } else if (config["background-size"] === "contain") {
                 const ratio = Math.min(ratioW, ratioH);
-             
+
                 dWidth = naturalWidth * ratio;
                 dHeight = naturalHeight * ratio;
             } else {
                 warn("background-size");
 
             }
-            dx=parseInt(config['background-position-x'])/100*(w-dWidth);
-            dy=parseInt(config['background-position-y'])/100*(h-dHeight);
-       
+            dx = parseInt(config['background-position-x']) / 100 * (w - dWidth);
+            dy = parseInt(config['background-position-y']) / 100 * (h - dHeight);
+
             if (config["background-repeat"] === "repeat") {
-                for (var i = 0-Math.ceil(dx/dWidth); i < w / dWidth+Math.ceil(-dx/dWidth); i++) {
-                    for (var j = 0-Math.ceil(dy/dHeight); j < h / dHeight+Math.ceil(-dy/dHeight); j++) {
-                        ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, dx+i * dWidth, dy+j * dHeight, dWidth, dHeight);
+                for (var i = 0 - Math.ceil(dx / dWidth); i < w / dWidth + Math.ceil(-dx / dWidth); i++) {
+                    for (var j = 0 - Math.ceil(dy / dHeight); j < h / dHeight + Math.ceil(-dy / dHeight); j++) {
+                        ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, dx + i * dWidth, dy + j * dHeight, dWidth, dHeight);
                     }
                 }
             } else if (config["background-repeat"] === 'no-repeat') {
@@ -215,17 +222,20 @@
 
         $target.after($wrapper);
         $target.prop(wrapperName, $wrapper);
-        $target.detach();        
+        $target.detach();
 
         let biasVy = 0;
+
         explode(function () {
             if (release) {
                 doRelease();
             } else if (recycle) {
                 doRecycle();
+            }else{
+                finish&&finish();
             }
         });
-
+        
         function doRelease(cb) {
             const startTime = Date.now();
             let leftCnt = rags.length;
@@ -306,7 +316,10 @@
 
                     rag.biasx = rag.translateX0;
                     rag.biasy = rag.translateY0;
-                    rag.transYMax = ctxHeight / 2 + groundDistance - rag.height / 2;
+                    if (gravity) {
+                        rag.transYMax = ctxHeight / 2 + groundDistance - rag.height / 2;
+                    }
+
                 });
             }
 
@@ -347,12 +360,20 @@
                         rag.biasy += (rag.vy + biasVy) * ratio;
 
                         if (gravity) {
-                            if (rag.biasy > rag.transYMax) {
+                            if (checkOutBound && checkOutBound(rag) 
+                                || rag.biasy > rag.transYMax
+                               || rag.biasy < rag.height/2) {
                                 leftCnt--;
                                 rag.land = true;
                                 rag.lastAngle = rag.finalAngleRad * angleRatio;
-                                rag.biasy = rag.transYMax;
+                                
+                                if(land){
+                                    rag.biasy = gravity>0?rag.transYMax:rag.height/2;
+                                }else{
+                                    rag.biasy=rag.transYMax*2;//hide
+                                }
                             }
+
                         }
                     }
 
