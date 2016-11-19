@@ -1,8 +1,8 @@
 {
   "name": "jquery-image-explode",
-  "version": "1.0.12",
+  "version": "1.0.14",
   "description": "A jQuery explosion plugin.",
-  "main": "jquery.imgexplode.js",
+  "main": "dist/jquery.imgexplode.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "eslint": "./node_modules/.bin/eslint jquery.imgexplode.js --cache --fix"
