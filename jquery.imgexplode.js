@@ -146,7 +146,7 @@
         const {
             naturalWidth,
             naturalHeight
-        } = $targetImage[0];
+        } = $targetImage?$targetImage[0]:{};
         if ($target.prop("tagName") === "IMG") {
             ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, 0, 0, w, h);
         } else if ($target.css("backgroundImage") !== "none") {
