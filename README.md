@@ -5,6 +5,7 @@
 #### Playground
 [http://blackmiaool.com/jquery-image-explode/playground.html](http://blackmiaool.com/jquery-image-explode/playground.html)
 
+MIT license
 
 [npm-url]: https://www.npmjs.com/package/jquery-image-explode
 [npm-image]: https://img.shields.io/npm/v/jquery-image-explode.svg
