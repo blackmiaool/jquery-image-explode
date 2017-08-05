@@ -5,6 +5,8 @@
 #### Playground
 [http://blackmiaool.com/jquery-image-explode/playground.html](http://blackmiaool.com/jquery-image-explode/playground.html)
 
+Compatible with zepto.
+
 MIT license
 
 [npm-url]: https://www.npmjs.com/package/jquery-image-explode

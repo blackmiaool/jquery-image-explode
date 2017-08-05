@@ -2,7 +2,7 @@
     "use strict";
     const wrapperName = "explode-wrapper";
     if(!$){
-        console.error("jQuery is needed.");
+        console.error("jQuery or Zepto is needed.");
         return;
     }
     $.fn.explodeRestore = function () {
@@ -401,9 +401,10 @@
             return parseInt(Math.random() * (max + 1 - min), 10) + min;
         }
         function shuffle(array) {
-            var currentIndex = array.length, temporaryValue, randomIndex;
+            let currentIndex = array.length, temporaryValue, randomIndex;
             while (currentIndex) {
                 randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex -= 1;
                 temporaryValue = array[currentIndex];
                 array[currentIndex] = array[randomIndex];
                 array[randomIndex] = temporaryValue;
@@ -573,4 +574,4 @@
             return ret;
         }
     };
-})(window.jQuery);
+})(window.jQuery||window.Zepto);
