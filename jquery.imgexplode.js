@@ -35,7 +35,6 @@
                 gravity = 0,
                 round = false,
                 groundDistance = 400,
-                ignoreCompelete = false,
                 land=true,
                 checkOutBound,
                 finish,
@@ -142,7 +141,9 @@
 
         const ctx = $canvas[0].getContext("2d");
         const ctx0 = $canvas0[0].getContext("2d");
-
+        function warn(key,config) {
+            console.warn(`Unsupported ${key} style:${config[key]}`);
+        }
         const {
             naturalWidth,
             naturalHeight
@@ -155,15 +156,13 @@
                 dWidth = naturalWidth,
                 dHeight = naturalHeight;
             let config = {
-                'background-repeat': $target.css("background-repeat"),
+                "background-repeat": $target.css("background-repeat"),
                 "background-size": $target.css("background-size"),
-                'background-position-x': $target.css("background-position-x"),
-                'background-position-y': $target.css("background-position-y"),
-            }
+                "background-position-x": $target.css("background-position-x"),
+                "background-position-y": $target.css("background-position-y"),
+            };
 
-            function warn(key) {
-                console.warn(`Unsupported ${key} style:${config[key]}`);
-            }
+            
             const ratioW = w / naturalWidth;
             const ratioH = h / naturalHeight;
 
@@ -179,11 +178,11 @@
                 dWidth = naturalWidth * ratio;
                 dHeight = naturalHeight * ratio;
             } else {
-                warn("background-size");
+                warn("background-size",config);
 
             }
-            dx = parseInt(config['background-position-x']) / 100 * (w - dWidth);
-            dy = parseInt(config['background-position-y']) / 100 * (h - dHeight);
+            dx = parseInt(config["background-position-x"]) / 100 * (w - dWidth);
+            dy = parseInt(config["background-position-y"]) / 100 * (h - dHeight);
 
             if (config["background-repeat"] === "repeat") {
                 for (var i = 0 - Math.ceil(dx / dWidth); i < w / dWidth + Math.ceil(-dx / dWidth); i++) {
@@ -191,10 +190,10 @@
                         ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, dx + i * dWidth, dy + j * dHeight, dWidth, dHeight);
                     }
                 }
-            } else if (config["background-repeat"] === 'no-repeat') {
+            } else if (config["background-repeat"] === "no-repeat") {
                 ctx0.drawImage($targetImage[0], 0, 0, naturalWidth, naturalHeight, dx, dy, dWidth, dHeight);
             } else {
-                warn("background-repeat");
+                warn("background-repeat",config);
             }
 
         } else if ($target.css("backgroundColor") !== "rgba(0, 0, 0, 0)") {
@@ -204,9 +203,6 @@
             console.warn("There's nothing to explode.");
         }
 
-
-        const scaleX = 1;
-        const scaleY = 1;
         rags.forEach((rag) => {
             const {
                 left,
@@ -215,9 +211,7 @@
                 height: ragHeight,
             } = rag;
 
-
             rag.naturalParams = [left, top, ragWidth, ragHeight];
-
         });
 
         $target.after($wrapper);
@@ -406,6 +400,16 @@
         function random(min, max) {
             return parseInt(Math.random() * (max + 1 - min), 10) + min;
         }
+        function shuffle(array) {
+            var currentIndex = array.length, temporaryValue, randomIndex;
+            while (currentIndex) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                temporaryValue = array[currentIndex];
+                array[currentIndex] = array[randomIndex];
+                array[randomIndex] = temporaryValue;
+            }
+            return array;
+        }
 
         //generate final position and angle of rags
         function getRagsFinalState() {
@@ -466,7 +470,7 @@
             const rags = [];
 
             const noRadius = radiusData.every(function (v) {
-                return v === 0
+                return v === 0;
             });
 
             for (let row = 0; row < rowCnt; row++) {
@@ -498,8 +502,8 @@
                 const y = h - top - height / 2;
 
                 if (noRadius || isInner(x, y) || radiusData.some(function (v, i) {
-                        return distanceLessThan(x, y, base[i][0] * w + 2 * (0.5 - base[i][0]) * v, base[i][1] * h + 2 * (0.5 - base[i][1]) * v, v);
-                    })) {
+                    return distanceLessThan(x, y, base[i][0] * w + 2 * (0.5 - base[i][0]) * v, base[i][1] * h + 2 * (0.5 - base[i][1]) * v, v);
+                })) {
                     rags.push({
                         left,
                         top,
@@ -544,11 +548,7 @@
                     generate(w - rowSum);
                 }
             }
-            rags.sort(function (rag1, rag2) {
-
-                return Math.random() > 0.5 ? 1 : -1;
-            });
-
+            shuffle(rags);
             return rags;
         }
         //get an array of 4 corners of radius        
@@ -566,7 +566,7 @@
             });
             ret = ret.map(function (radius) {
                 if (radius > width / 2) {
-                    radius = width / 2
+                    radius = width / 2;
                 }
                 return radius;
             });
