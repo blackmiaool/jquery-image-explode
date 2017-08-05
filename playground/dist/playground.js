@@ -156,8 +156,8 @@ if (initValue) {
         if (!initValue.params.hasOwnProperty(v.name)) return;
         v.initValue = initValue.params[v.name];
     });
-    for (var i in settings) {
-        settings[i].initValue = initValue.settings[i];
+    for (var _i in settings) {
+        settings[_i].initValue = initValue.settings[_i];
     }
 }
 //console.log(settings, params)
@@ -194,11 +194,11 @@ function generateEffectUrl() {
         settings: {},
         params: {}
     };
-    for (var i in params) {
-        result.params[params[i].name] = params[i].value;
+    for (var _i2 in params) {
+        result.params[params[_i2].name] = params[_i2].value;
     }
-    for (var i in settings) {
-        result.settings[i] = settings[i].value;
+    for (var _i3 in settings) {
+        result.settings[_i3] = settings[_i3].value;
     }
 
     result = baseAddr + "?" + encodeURIComponent(JSON.stringify(result));

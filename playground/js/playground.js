@@ -1,4 +1,4 @@
-const baseAddr = `http://blackmiaool.com/jquery-image-explode/playground.html`;
+const baseAddr = "http://blackmiaool.com/jquery-image-explode/playground.html";
 var ng = angular.module("app", []);
 
 function extend(dest, src) {
@@ -37,22 +37,21 @@ const effectUrl = {
     type: "textarea",
     title: "Share the effect",
     value: location.href,
-}
+};
 const demo = {
     name: "demo",
     type: "textarea",
     title: "Copy to use",
-}
-const params = [
-    {
-        name: "minWidth",
-        type: "number",
-        title: "Minimum rag size",
-        min: 1,
-        max: 100,
-        value: 0,
-        initValue: 3,
-    },
+};
+const params = [{
+    name: "minWidth",
+    type: "number",
+    title: "Minimum rag size",
+    min: 1,
+    max: 100,
+    value: 0,
+    initValue: 3,
+},
     {
         name: "maxWidth",
         type: "number",
@@ -170,7 +169,7 @@ if (initValue) {
             return;
         v.initValue = initValue.params[v.name];
     });
-    for (var i in settings) {
+    for (const i in settings) {
         settings[i].initValue = initValue.settings[i];
     }
 }
@@ -189,7 +188,7 @@ function getFinalParams() {
         }
         finalParams[v.name] = value;
     });
-    return finalParams;    
+    return finalParams;
 }
 
 function explode() {
@@ -208,10 +207,10 @@ function generateEffectUrl() {
         settings: {},
         params: {}
     };
-    for (var i in params) {
+    for (const i in params) {
         result.params[params[i].name] = params[i].value;
     }
-    for (var i in settings) {
+    for (const i in settings) {
         result.settings[i] = settings[i].value;
     }
 

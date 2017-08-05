@@ -6,7 +6,7 @@
         return;
     }
     $.fn.explodeRestore = function () {
-        this.each(function () { //explode separately
+        this.each(function () { //restore separately
             const $dom = $(this);
             const wrapper = $dom.prop(wrapperName);
             if (wrapper) {
@@ -56,7 +56,9 @@
         } else if (!$target.length) {
             return;
         }
-
+        if(!$.contains(document,$target[0])){
+            return ;
+        }
         if ($target.prop("tagName") === "IMG") {
             if (!$target.prop("complete")) {
 
