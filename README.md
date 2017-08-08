@@ -2,10 +2,11 @@
 [![NPM version][npm-image]][npm-url]
 
 <p align="center">      
-    <img src="http://blackmiaool.com/jquery-image-explode/preview/output1.gif">  
-    <img src="http://blackmiaool.com/jquery-image-explode/preview/output2.gif">  
-    <img src="http://blackmiaool.com/jquery-image-explode/preview/output0.gif">
+    <img width="150" src="http://blackmiaool.com/jquery-image-explode/preview/output1.gif">  
+    <img width="150" src="http://blackmiaool.com/jquery-image-explode/preview/output2.gif">  
+    <img width="150" src="http://blackmiaool.com/jquery-image-explode/preview/output0.gif">
 </p>
+
 #### A very simple demo
 [http://blackmiaool.com/jquery-image-explode](http://blackmiaool.com/jquery-image-explode)
 #### Playground
