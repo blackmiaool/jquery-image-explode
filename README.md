@@ -12,7 +12,7 @@
 #### Playground
 [http://blackmiaool.com/jquery-image-explode/playground.html](http://blackmiaool.com/jquery-image-explode/playground.html)
 
-Compatible with zepto.
+Compatible with Zepto.
 
 MIT license
 
