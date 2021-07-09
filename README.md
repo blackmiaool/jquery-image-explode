@@ -14,6 +14,8 @@
 
 Compatible with Zepto.
 
+[https://github.com/sorskoot/jquery-image-explode](No-jquery Edition by sorskoot, not verified by me)
+
 MIT license
 
 [npm-url]: https://www.npmjs.com/package/jquery-image-explode
